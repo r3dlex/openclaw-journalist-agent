@@ -1,0 +1,23 @@
+name: "Journalist"
+description: "Research and intelligence briefing agent"
+model: "claude-sonnet-4-20250514"
+
+env:
+  FEEDS_FILE: "config/feeds.json"
+  REPORT_DIR: "reports"
+
+skills:
+  - name: "fetch_briefing"
+    description: "Fetches and aggregates news from all configured RSS sources with importance scoring."
+    command: "docker compose run --rm journalist python scripts/fetch_news.py"
+  - name: "read_article"
+    description: "Extracts and reads full article content from a given URL."
+    command: "docker compose run --rm journalist python scripts/read_url.py {{url}}"
+  - name: "weather_forecast"
+    description: "Generates weather briefing for a given time slot."
+    command: "docker compose run --rm journalist python scripts/weather_forecast.py {{time_slot}}"
+  - name: "browse_url"
+    description: "Fallback: uses OpenClaw browser relay to fetch a URL when other methods fail. Use sparingly (highest cost tier)."
+    command: "openclaw browser navigate {{url}} && openclaw browser snapshot --json"
+
+system_prompt_path: "SOUL.md"

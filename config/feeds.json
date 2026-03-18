@@ -1,0 +1,55 @@
+{
+  "categories": {
+    "BREAKING / HIGH PRIORITY": [
+      "https://www.politico.eu/feed/",
+      "http://feeds.bbci.co.uk/news/world/rss.xml"
+    ],
+    "AI & MODELS": [
+      "https://openai.com/blog/rss.xml",
+      "https://www.anthropic.com/rss.xml",
+      "https://blog.google/technology/ai/rss",
+      "https://huggingface.co/blog/feed.xml",
+      "https://www.x.ai/blog"
+    ],
+    "TECH & DEV": [
+      "http://feeds.feedburner.com/TechCrunch/",
+      "https://feeds.arstechnica.com/arstechnica/index",
+      "https://www.theverge.com/rss/index.xml",
+      "https://slashdot.org/rssheadlines.xml"
+    ],
+    "LINUX & OPEN SOURCE": [
+      "https://www.phoronix.com/rss.php",
+      "https://www.linuxfoundation.org/feed",
+      "https://kernel.org/feed.atom"
+    ],
+    "GERMANY & EUROPE": [
+      "https://www.tagesschau.de/xml/rss2",
+      "https://www.spiegel.de/schlagzeilen/tops/index.rss",
+      "https://www.handelsblatt.com/contentexport/feed/top-themen"
+    ],
+    "BRAZIL & LATAM": [
+      "https://g1.globo.com/rss/g1/"
+    ],
+    "GLOBAL & ECON": [
+      "https://www.aljazeera.com/xml/rss/all.xml",
+      "https://www.scmp.com/rss/2/feed"
+    ]
+  },
+  "important_keywords": [
+    "breaking", "exclusive", "urgent", "crisis",
+    "war", "attack", "election", "vote", "parliament", "eu", "european",
+    "trump", "biden", "china", "russia", "ukraine", "nato", "climate",
+    "economy", "recession", "inflation", "market", "stock",
+    "ai", "artificial intelligence", "gpt", "claude", "gemini",
+    "openai", "anthropic", "deepseek", "llm", "reasoning", "multimodal",
+    "launch", "release", "announce", "benchmark", "api",
+    "google", "microsoft", "meta", "xai"
+  ],
+  "settings": {
+    "max_entries_per_feed": 5,
+    "importance_threshold_for_detail": 3,
+    "max_concurrent_fetchers": 10,
+    "article_max_chars": 2000,
+    "request_timeout_seconds": 15
+  }
+}

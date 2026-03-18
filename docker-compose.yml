@@ -1,0 +1,30 @@
+services:
+  journalist:
+    build: .
+    env_file: .env
+    volumes:
+      - ./scripts:/app/scripts:ro
+      - ./config:/app/config:ro
+      - ${JOURNALIST_DATA_DIR:-.}/log:/app/log
+      - ${JOURNALIST_DATA_DIR:-.}/reports:/app/reports
+    working_dir: /app
+
+  pipeline:
+    build:
+      context: ./tools
+      target: production
+    env_file: .env
+    volumes:
+      - ./config:/app/config:ro
+      - ${JOURNALIST_DATA_DIR:-.}/log:/app/log
+      - ${JOURNALIST_DATA_DIR:-.}/reports:/app/reports
+    working_dir: /app
+
+  pipeline-test:
+    build:
+      context: ./tools
+      target: test
+    env_file: .env
+    volumes:
+      - ./config:/app/config:ro
+    working_dir: /app

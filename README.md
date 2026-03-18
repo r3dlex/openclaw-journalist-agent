@@ -1,2 +1,135 @@
-# openclaw-journalist-agent
-Agent that gathers and crawls information in the background and outputs in a structured format for a particular story
+# OpenClaw Journalist Agent
+
+An autonomous research and intelligence briefing agent built on [OpenClaw](https://docs.openclaw.ai/).
+
+The Journalist gathers, crawls, scores, and synthesizes information from RSS feeds, web sources, and knowledge bases. It delivers structured briefings and hands off results to the [Librarian](https://github.com/your-org/openclaw-librarian-agent) agent for archival.
+
+## Features
+
+- **RSS aggregation** with importance scoring and deduplication
+- **Three-tier research pipeline**: RSS (free) -> headless browser (medium) -> OpenClaw browser relay (fallback)
+- **Composable pipelines** with testable steps (see `spec/PIPELINES.md`)
+- **Scheduled briefings** with configurable cron (see `spec/CRON.md`)
+- **Weather forecasting** with 5 daily time slots
+- **Inter-agent collaboration** with the Librarian agent
+- **Architecture Decision Records** via [archgate](https://github.com/archgate/cli)
+- **Zero-install** via Docker containers
+- **No secrets in git** - all configuration via `.env`
+
+## Quick Start
+
+```bash
+# 1. Clone and configure
+git clone https://github.com/your-org/openclaw-journalist-agent.git
+cd openclaw-journalist-agent
+cp .env.example .env
+# Edit .env with your values
+
+# 2. Build and run
+docker compose build
+
+# Run via pipeline (recommended)
+docker compose run --rm pipeline news
+docker compose run --rm pipeline weather 6am
+
+# Or legacy scripts
+docker compose run --rm journalist python scripts/fetch_news.py
+
+# 3. Run tests
+docker compose run --rm pipeline-test
+```
+
+## Prerequisites
+
+- [Docker](https://docs.docker.com/get-docker/) and Docker Compose
+- [OpenClaw](https://docs.openclaw.ai/) (for browser relay fallback and agent hosting)
+
+No Python, Node, or other runtime installation required on the host.
+
+## Configuration
+
+All configuration is via environment variables in `.env`. See `.env.example` for the full list.
+
+| Variable | Description | Default |
+|----------|-------------|---------|
+| `JOURNALIST_DATA_DIR` | Where logs and reports are stored | `.` |
+| `LIBRARIAN_AGENT_WORKSPACE` | Path to librarian agent | - |
+| `WEATHER_LOCATION` | City for weather forecasts | `Stuttgart` |
+| `NEWS_API_KEY` | Optional NewsAPI key | - |
+| `FEEDS_FILE` | Path to RSS feed config | `config/feeds.json` |
+| `AGENT_MODEL` | Claude model for the agent | `claude-sonnet-4-20250514` |
+
+## Skills
+
+| Skill | Purpose | Cost Tier |
+|-------|---------|-----------|
+| `fetch_briefing` | RSS aggregation with importance scoring | Tier 1 (free) |
+| `read_article` | Article content extraction from URLs | Tier 1/2 |
+| `weather_forecast` | Weather briefings by time slot | Tier 1 (free) |
+| `browse_url` | OpenClaw browser relay (full JS rendering) | Tier 3 (fallback) |
+
+The agent follows a tiered research approach: RSS first (free), then direct HTTP extraction,
+then OpenClaw browser relay only as a last resort (highest credit cost).
+
+### Running Pipelines (Recommended)
+
+```bash
+docker compose run --rm pipeline news                    # News briefing
+docker compose run --rm pipeline article <url>           # Article extraction
+docker compose run --rm pipeline weather <slot>          # Weather briefing
+docker compose run --rm pipeline validate                # Validate config
+```
+
+### Running Legacy Scripts
+
+```bash
+docker compose run --rm journalist python scripts/fetch_news.py
+docker compose run --rm journalist python scripts/read_url.py <url>
+docker compose run --rm journalist python scripts/weather_forecast.py <slot>
+```
+
+## Architecture
+
+Architecture decisions are tracked as ADRs in `.archgate/adrs/` following the
+[archgate](https://github.com/archgate/cli) format.
+
+| ADR | Decision |
+|-----|----------|
+| `ARCH-001` | Three-Tier Research Pipeline |
+| `ARCH-002` | Zero-Install Containerization |
+| `ARCH-003` | Pipeline Architecture |
+| `ARCH-004` | Inter-Agent Collaboration Protocol |
+| `ARCH-005` | Cost Management Strategy |
+
+See `spec/ARCHITECTURE.md` for the full system design.
+
+## Testing
+
+```bash
+# Run all pipeline tests (Docker, zero-install)
+docker compose run --rm pipeline-test
+
+# Local development
+cd tools && poetry install && poetry run pytest -v
+```
+
+See `spec/TESTING.md` for the complete test strategy.
+
+## Documentation
+
+| File | Audience | Purpose |
+|------|----------|---------|
+| `CLAUDE.md` | Developers | How to work on this repo |
+| `AGENTS.md` | Journalist agent | Operational framework |
+| `SOUL.md` | Journalist agent | Identity and protocols |
+| `spec/ARCHITECTURE.md` | Both | System design + ADR index |
+| `spec/PIPELINES.md` | Both | Pipeline architecture |
+| `spec/CRON.md` | Journalist agent | Scheduled tasks |
+| `spec/TASK.md` | Journalist agent | One-shot task queue |
+| `spec/TESTING.md` | Developers | How to test |
+| `spec/TROUBLESHOOTING.md` | Both | Common issues |
+| `spec/LEARNINGS.md` | Both | Lessons learned |
+
+## License
+
+MIT - see [LICENSE](LICENSE).

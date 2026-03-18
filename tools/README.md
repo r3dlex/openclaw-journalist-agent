@@ -1,0 +1,72 @@
+# Pipeline Runner
+
+Zero-install Python pipeline runner for the Journalist agent.
+
+## Quick Start
+
+```bash
+# Build and test (zero-install)
+docker compose run --rm pipeline-test
+
+# Run a pipeline
+docker compose run --rm pipeline news
+docker compose run --rm pipeline article https://example.com/story
+docker compose run --rm pipeline weather 6am
+docker compose run --rm pipeline validate
+```
+
+## Architecture
+
+Pipelines are built from composable **steps**. Each step receives a context dict
+and returns an updated context dict. Steps can be skipped, retried, or chained.
+
+```
+FetchFeeds → ScoreImportance → FormatBriefing → LibrarianHandoff
+```
+
+See `spec/PIPELINES.md` for the full specification and `spec/ARCHITECTURE.md`
+for how pipelines fit into the overall system design.
+
+## Module Structure
+
+```
+pipeline_runner/
+├── __init__.py          # Package metadata
+├── cli.py               # CLI entry point
+├── config.py            # Configuration (from .env and feeds.json)
+├── runner.py            # Core pipeline engine
+├── pipelines/           # Pre-built pipeline definitions
+│   ├── news.py          # News briefing pipeline
+│   ├── article.py       # Article extraction pipeline
+│   └── weather.py       # Weather briefing pipeline
+└── steps/               # Composable pipeline steps
+    ├── fetch.py          # RSS/HTTP fetch (Tier 1)
+    ├── extract.py        # HTML content extraction
+    ├── score.py          # Importance scoring
+    ├── format.py         # Output formatting
+    └── handoff.py        # Librarian handoff
+```
+
+## Testing
+
+```bash
+# Unit tests (in Docker)
+docker compose run --rm pipeline-test
+
+# Local development (requires Poetry)
+cd tools
+poetry install
+poetry run pytest -v
+poetry run ruff check pipeline_runner/
+poetry run mypy pipeline_runner/
+```
+
+## Dependencies
+
+Managed via Poetry (`pyproject.toml`). Key dependencies:
+- `feedparser` — RSS parsing
+- `requests` — HTTP client
+- `beautifulsoup4` — HTML extraction
+- `pydantic` / `pydantic-settings` — Configuration management
+
+Dev dependencies: `pytest`, `ruff`, `mypy`
