@@ -25,9 +25,7 @@ def main() -> None:
         prog="pipeline",
         description="Journalist Agent pipeline runner",
     )
-    parser.add_argument(
-        "-v", "--verbose", action="store_true", help="Enable debug logging"
-    )
+    parser.add_argument("-v", "--verbose", action="store_true", help="Enable debug logging")
 
     subparsers = parser.add_subparsers(dest="command", required=True)
 

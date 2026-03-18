@@ -60,18 +60,18 @@ def build_weather_pipeline(settings: PipelineSettings | None = None) -> Pipeline
     return pipeline
 
 
-def run_weather_pipeline(
-    time_slot: str = "6am", settings: PipelineSettings | None = None
-) -> str:
+def run_weather_pipeline(time_slot: str = "6am", settings: PipelineSettings | None = None) -> str:
     """Convenience function: fetch and format weather for a time slot."""
     settings = settings or PipelineSettings()
 
     pipeline = build_weather_pipeline(settings)
-    result = pipeline.run({
-        "settings": settings,
-        "time_slot": time_slot,
-        "pipeline_name": "weather_briefing",
-    })
+    result = pipeline.run(
+        {
+            "settings": settings,
+            "time_slot": time_slot,
+            "pipeline_name": "weather_briefing",
+        }
+    )
 
     if result.success:
         return result.context.get("weather_briefing", "No weather data.")

@@ -19,9 +19,7 @@ class PipelineSettings(BaseSettings):
 
     # Paths
     journalist_data_dir: Path = Field(default=Path("."), alias="JOURNALIST_DATA_DIR")
-    librarian_agent_workspace: Path = Field(
-        default=Path(""), alias="LIBRARIAN_AGENT_WORKSPACE"
-    )
+    librarian_agent_workspace: Path = Field(default=Path(""), alias="LIBRARIAN_AGENT_WORKSPACE")
     feeds_file: Path = Field(default=Path("config/feeds.json"), alias="FEEDS_FILE")
     workspace_dir: Path = Field(default=Path("."), alias="JOURNALIST_WORKSPACE_DIR")
 

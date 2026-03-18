@@ -65,9 +65,7 @@ class LibrarianHandoffStep:
             signal_path.write_text(json.dumps(metadata, indent=2), encoding="utf-8")
             logger.info("Handoff signal written to %s", signal_path)
         else:
-            logger.warning(
-                "Librarian workspace not configured or not found: %s", librarian_ws
-            )
+            logger.warning("Librarian workspace not configured or not found: %s", librarian_ws)
 
         context["handoff_path"] = output_path
         context["handoff_metadata"] = metadata

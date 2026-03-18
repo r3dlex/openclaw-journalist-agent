@@ -37,11 +37,13 @@ def run_news_pipeline(settings: PipelineSettings | None = None) -> str:
     feed_config = FeedConfig(settings.feeds_file)
 
     pipeline = build_news_pipeline(settings)
-    result = pipeline.run({
-        "settings": settings,
-        "feeds_config": feed_config,
-        "pipeline_name": "news_briefing",
-    })
+    result = pipeline.run(
+        {
+            "settings": settings,
+            "feeds_config": feed_config,
+            "pipeline_name": "news_briefing",
+        }
+    )
 
     if result.success:
         return result.context.get("briefing", "No briefing generated.")

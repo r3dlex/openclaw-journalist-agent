@@ -39,11 +39,13 @@ def run_article_pipeline(url: str, settings: PipelineSettings | None = None) -> 
     settings = settings or PipelineSettings()
 
     pipeline = build_article_pipeline(settings, handoff=False)
-    result = pipeline.run({
-        "settings": settings,
-        "url": url,
-        "pipeline_name": "article_extraction",
-    })
+    result = pipeline.run(
+        {
+            "settings": settings,
+            "url": url,
+            "pipeline_name": "article_extraction",
+        }
+    )
 
     if result.success:
         title = result.context.get("title", "")

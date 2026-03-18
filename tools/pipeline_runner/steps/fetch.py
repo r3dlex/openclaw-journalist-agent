@@ -18,7 +18,9 @@ from pipeline_runner.config import FeedConfig, PipelineSettings
 
 logger = logging.getLogger(__name__)
 
-USER_AGENT = "JournalistAgent/0.1 (OpenClaw; +https://github.com/your-org/openclaw-journalist-agent)"
+USER_AGENT = (
+    "JournalistAgent/0.1 (OpenClaw; +https://github.com/your-org/openclaw-journalist-agent)"
+)
 
 
 @dataclass
@@ -47,9 +49,7 @@ class FetchFeedsStep:
 
     def execute(self, context: dict[str, Any]) -> dict[str, Any]:
         settings: PipelineSettings = context.get("settings", PipelineSettings())
-        feed_config: FeedConfig = context.get(
-            "feeds_config", FeedConfig(settings.feeds_file)
-        )
+        feed_config: FeedConfig = context.get("feeds_config", FeedConfig(settings.feeds_file))
 
         entries: list[FeedEntry] = []
         max_workers = feed_config.max_concurrent_fetchers
@@ -82,9 +82,7 @@ class FetchFeedsStep:
         return context
 
 
-def _parse_single_feed(
-    category: str, url: str, max_entries: int, timeout: int
-) -> list[FeedEntry]:
+def _parse_single_feed(category: str, url: str, max_entries: int, timeout: int) -> list[FeedEntry]:
     """Parse a single RSS feed URL."""
     response = requests.get(url, timeout=timeout, headers={"User-Agent": USER_AGENT})
     response.raise_for_status()
