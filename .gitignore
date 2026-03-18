@@ -45,6 +45,9 @@ data/
 # --- Agent memory (private, not for git) ---
 memory/
 
+# --- Agent runtime (created by handoff steps, not for git) ---
+inbox/
+
 # --- Test / Coverage ---
 htmlcov/
 .tox/
