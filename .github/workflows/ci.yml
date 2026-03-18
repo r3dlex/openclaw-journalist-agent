@@ -1,0 +1,229 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+permissions:
+  contents: read
+
+jobs:
+  # ── Pipeline Runner: lint, type-check, unit tests ────────────────
+  pipeline-lint:
+    name: Lint & Type Check
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: tools
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Install Poetry
+        run: pip install poetry==1.8.*
+
+      - name: Cache Poetry virtualenv
+        uses: actions/cache@v4
+        with:
+          path: tools/.venv
+          key: poetry-${{ runner.os }}-3.12-${{ hashFiles('tools/poetry.lock') }}
+          restore-keys: poetry-${{ runner.os }}-3.12-
+
+      - name: Install dependencies
+        run: poetry install
+
+      - name: Ruff lint
+        run: poetry run ruff check pipeline_runner/
+
+      - name: Ruff format check
+        run: poetry run ruff format --check pipeline_runner/
+
+      - name: Mypy type check
+        run: poetry run mypy pipeline_runner/
+
+  pipeline-test:
+    name: Pipeline Tests
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: tools
+    strategy:
+      matrix:
+        python-version: ["3.12", "3.13"]
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: ${{ matrix.python-version }}
+
+      - name: Install Poetry
+        run: pip install poetry==1.8.*
+
+      - name: Cache Poetry virtualenv
+        uses: actions/cache@v4
+        with:
+          path: tools/.venv
+          key: poetry-${{ runner.os }}-${{ matrix.python-version }}-${{ hashFiles('tools/poetry.lock') }}
+          restore-keys: poetry-${{ runner.os }}-${{ matrix.python-version }}-
+
+      - name: Install dependencies
+        run: poetry install
+
+      - name: Run unit tests with coverage
+        run: poetry run pytest tests/ -v --tb=short --cov=pipeline_runner --cov-report=xml --cov-report=term-missing
+
+      - name: Upload coverage artifact
+        if: matrix.python-version == '3.12'
+        uses: actions/upload-artifact@v4
+        with:
+          name: coverage-report
+          path: tools/coverage.xml
+
+  # ── Pipeline-specific integration tests (mocked, no network) ────
+  pipeline-news:
+    name: "Pipeline: News Briefing"
+    runs-on: ubuntu-latest
+    needs: [pipeline-test]
+    defaults:
+      run:
+        working-directory: tools
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - run: pip install poetry==1.8.* && poetry install
+      - name: Test news pipeline end-to-end
+        run: poetry run pytest tests/test_pipelines/test_news.py -v --tb=long
+
+  pipeline-article:
+    name: "Pipeline: Article Extraction"
+    runs-on: ubuntu-latest
+    needs: [pipeline-test]
+    defaults:
+      run:
+        working-directory: tools
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - run: pip install poetry==1.8.* && poetry install
+      - name: Test article pipeline end-to-end
+        run: poetry run pytest tests/test_pipelines/test_article.py -v --tb=long
+
+  pipeline-weather:
+    name: "Pipeline: Weather Briefing"
+    runs-on: ubuntu-latest
+    needs: [pipeline-test]
+    defaults:
+      run:
+        working-directory: tools
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - run: pip install poetry==1.8.* && poetry install
+      - name: Test weather pipeline end-to-end
+        run: poetry run pytest tests/test_pipelines/test_weather.py -v --tb=long
+
+  # ── Docker build validation ─────────────────────────────────────
+  docker-build:
+    name: Docker Build
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Create dummy .env for build
+        run: cp .env.example .env
+
+      - name: Build legacy journalist image
+        run: docker compose build journalist
+
+      - name: Build pipeline runner image
+        run: docker compose build pipeline
+
+      - name: Build pipeline test image
+        run: docker compose build pipeline-test
+
+      - name: Run pipeline tests in container
+        run: docker compose run --rm pipeline-test
+
+  # ── Security: scan for secrets in committed files ───────────────
+  secrets-scan:
+    name: Secrets Scan
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Check .env is not tracked
+        run: |
+          if git ls-files --error-unmatch .env 2>/dev/null; then
+            echo "::error::.env is tracked in git! Remove it immediately."
+            exit 1
+          fi
+          echo "OK: .env is not tracked"
+
+      - name: Scan for hardcoded secrets
+        run: |
+          FOUND=$(grep -rn --include='*.py' --include='*.md' --include='*.yaml' \
+            --include='*.yml' --include='*.json' --include='*.toml' \
+            -iE '(password|secret|token)\s*[:=]\s*["\x27][^"\x27]{8,}' . \
+            | grep -v '.git/' \
+            | grep -v '.env.example' \
+            | grep -v 'node_modules' \
+            | grep -v 'REDACTED' \
+            | grep -v 'your_' \
+            | grep -v 'placeholder' \
+            || true)
+          if [ -n "$FOUND" ]; then
+            echo "::error::Potential secrets found in committed files:"
+            echo "$FOUND"
+            exit 1
+          fi
+          echo "OK: No hardcoded secrets found"
+
+      - name: Scan for hardcoded local paths
+        run: |
+          FOUND=$(grep -rn --include='*.py' --include='*.md' --include='*.yaml' \
+            --include='*.yml' --include='*.json' --include='*.toml' \
+            -E '(/Users/[a-zA-Z]|/home/[a-zA-Z]|/Volumes/[a-zA-Z]|C:\\Users\\)' . \
+            | grep -v '.git/' \
+            | grep -v 'node_modules' \
+            || true)
+          if [ -n "$FOUND" ]; then
+            echo "::error::Hardcoded local paths found in committed files:"
+            echo "$FOUND"
+            exit 1
+          fi
+          echo "OK: No hardcoded paths found"
+
+  # ── Feed config validation ──────────────────────────────────────
+  validate-config:
+    name: Validate Config
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Validate feeds.json
+        run: python3 -c "import json; d=json.load(open('config/feeds.json')); print(f'OK: {sum(len(v) for v in d[\"categories\"].values())} feeds in {len(d[\"categories\"])} categories')"
+
+      - name: Validate .env.example has all required vars
+        run: |
+          REQUIRED="JOURNALIST_DATA_DIR LIBRARIAN_AGENT_WORKSPACE WEATHER_LOCATION FEEDS_FILE"
+          for var in $REQUIRED; do
+            if ! grep -q "^${var}=" .env.example; then
+              echo "::error::Missing required variable $var in .env.example"
+              exit 1
+            fi
+          done
+          echo "OK: All required variables present in .env.example"

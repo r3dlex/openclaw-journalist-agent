@@ -103,9 +103,36 @@ openclaw browser navigate "https://en.wikipedia.org/wiki/Main_Page" && openclaw 
 - [ ] No secrets in git: `git diff --cached | grep -iE '(api_key|password|token|secret)'` returns nothing
 - [ ] `.env` is NOT tracked: `git ls-files .env` returns nothing
 
+## Continuous Integration
+
+All tests run automatically on every push and pull request via GitHub Actions.
+
+**Workflow:** `.github/workflows/ci.yml`
+
+| Job | What it does |
+|-----|-------------|
+| `pipeline-lint` | Ruff lint + format check + mypy type check |
+| `pipeline-test` | Full pytest suite on Python 3.12 and 3.13 with coverage |
+| `pipeline-news` | News pipeline integration test (isolated) |
+| `pipeline-article` | Article pipeline integration test (isolated) |
+| `pipeline-weather` | Weather pipeline integration test (isolated) |
+| `docker-build` | Build all Docker images + run containerized tests |
+| `secrets-scan` | Scan for hardcoded secrets and local paths |
+| `validate-config` | Validate feeds.json and .env.example completeness |
+
+CI will fail if:
+- Any test fails
+- Ruff finds lint issues
+- Mypy finds type errors
+- Hardcoded secrets or local paths are detected
+- `.env` is accidentally committed
+- `config/feeds.json` is malformed
+- `.env.example` is missing required variables
+
 ## Related
 
 - **Pipeline spec**: `spec/PIPELINES.md`
 - **Architecture**: `spec/ARCHITECTURE.md`
 - **Troubleshooting**: `spec/TROUBLESHOOTING.md`
 - **ADR**: `.archgate/adrs/ARCH-003-pipeline-architecture.md`
+- **CI workflow**: `.github/workflows/ci.yml`

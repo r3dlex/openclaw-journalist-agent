@@ -58,6 +58,9 @@ hands off results to the **Librarian** agent for archival.
 │   ├── TESTING.md       # How to test the agent
 │   ├── TROUBLESHOOTING.md  # Common issues and fixes
 │   └── LEARNINGS.md     # Lessons learned over time
+├── .github/
+│   └── workflows/
+│       └── ci.yml       # GitHub Actions CI pipeline
 ├── Dockerfile           # Zero-install container for legacy scripts
 ├── docker-compose.yml   # Full stack orchestration
 └── LICENSE              # MIT
@@ -109,7 +112,7 @@ This runs on the host via `openclaw browser` (not containerized).
 ADRs follow the [archgate](https://github.com/archgate/cli) format in `.archgate/adrs/`.
 See `spec/ARCHITECTURE.md` for the ADR index and how they map to the system design.
 
-## Testing
+## Testing & CI
 
 Run tests via Docker (zero-install):
 
@@ -121,7 +124,15 @@ docker compose run --rm pipeline-test
 cd tools && poetry install && poetry run pytest -v
 ```
 
-See `spec/TESTING.md` for the full test strategy.
+**GitHub Actions** (`.github/workflows/ci.yml`) runs on every push and PR:
+- Lint + type check (ruff, mypy)
+- Unit tests on Python 3.12 and 3.13
+- Per-pipeline integration tests (news, article, weather)
+- Docker build validation
+- Secrets scan (blocks if hardcoded secrets or local paths found)
+- Config validation (feeds.json, .env.example)
+
+See `spec/TESTING.md` for the full test strategy and CI matrix.
 
 ## Progressive Disclosure
 
@@ -140,6 +151,7 @@ For deeper topics, see `spec/`:
 - User profile data is referenced via `$USER_DISPLAY_NAME` etc. in templates
 - The `.gitignore` excludes: `.env`, `artifacts/`, `logs/`, `memory/`, `.openclaw/`
 - Before committing, run: `git diff --cached` and check for secrets
+- CI will block merges if secrets or hardcoded paths are detected
 
 ## Contributing
 

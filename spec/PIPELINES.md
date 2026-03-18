@@ -123,9 +123,19 @@ To add a new pipeline:
 5. Document in this file
 6. If architecturally significant, create an ADR in `.archgate/adrs/`
 
+## Continuous Integration
+
+Each pipeline has a dedicated CI job in `.github/workflows/ci.yml`:
+- `pipeline-news` — runs `test_pipelines/test_news.py`
+- `pipeline-article` — runs `test_pipelines/test_article.py`
+- `pipeline-weather` — runs `test_pipelines/test_weather.py`
+
+These run on every push and PR. See `spec/TESTING.md` for the full CI matrix.
+
 ## Related
 
 - **Architecture:** `spec/ARCHITECTURE.md`
 - **ADRs:** `.archgate/adrs/ARCH-003-pipeline-architecture.md`
 - **Testing:** `spec/TESTING.md`
+- **CI workflow:** `.github/workflows/ci.yml`
 - **Cron schedule:** `spec/CRON.md`

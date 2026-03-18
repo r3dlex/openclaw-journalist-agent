@@ -103,7 +103,7 @@ Architecture decisions are tracked as ADRs in `.archgate/adrs/` following the
 
 See `spec/ARCHITECTURE.md` for the full system design.
 
-## Testing
+## Testing & CI
 
 ```bash
 # Run all pipeline tests (Docker, zero-install)
@@ -113,7 +113,13 @@ docker compose run --rm pipeline-test
 cd tools && poetry install && poetry run pytest -v
 ```
 
-See `spec/TESTING.md` for the complete test strategy.
+**GitHub Actions** runs on every push and PR (`.github/workflows/ci.yml`):
+- Lint, type check, and unit tests (Python 3.12 + 3.13)
+- Per-pipeline integration tests (news, article, weather)
+- Docker build validation
+- Secrets scan and config validation
+
+See `spec/TESTING.md` for the complete test strategy and CI matrix.
 
 ## Documentation
 
