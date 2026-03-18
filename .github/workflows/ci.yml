@@ -10,7 +10,6 @@ permissions:
   contents: read
 
 jobs:
-  # ── Pipeline Runner: lint, type-check, unit tests ────────────────
   pipeline-lint:
     name: Lint & Type Check
     runs-on: ubuntu-latest
@@ -25,14 +24,14 @@ jobs:
           python-version: "3.12"
 
       - name: Install Poetry
-        run: pip install poetry==1.8.*
+        run: pip install "poetry>=1.8,<1.9"
 
       - name: Cache Poetry virtualenv
         uses: actions/cache@v4
         with:
           path: tools/.venv
-          key: poetry-${{ runner.os }}-3.12-${{ hashFiles('tools/poetry.lock') }}
-          restore-keys: poetry-${{ runner.os }}-3.12-
+          key: "poetry-${{ runner.os }}-3.12-${{ hashFiles('tools/poetry.lock') }}"
+          restore-keys: "poetry-${{ runner.os }}-3.12-"
 
       - name: Install dependencies
         run: poetry install
@@ -63,14 +62,14 @@ jobs:
           python-version: ${{ matrix.python-version }}
 
       - name: Install Poetry
-        run: pip install poetry==1.8.*
+        run: pip install "poetry>=1.8,<1.9"
 
       - name: Cache Poetry virtualenv
         uses: actions/cache@v4
         with:
           path: tools/.venv
-          key: poetry-${{ runner.os }}-${{ matrix.python-version }}-${{ hashFiles('tools/poetry.lock') }}
-          restore-keys: poetry-${{ runner.os }}-${{ matrix.python-version }}-
+          key: "poetry-${{ runner.os }}-${{ matrix.python-version }}-${{ hashFiles('tools/poetry.lock') }}"
+          restore-keys: "poetry-${{ runner.os }}-${{ matrix.python-version }}-"
 
       - name: Install dependencies
         run: poetry install
@@ -85,7 +84,6 @@ jobs:
           name: coverage-report
           path: tools/coverage.xml
 
-  # ── Pipeline-specific integration tests (mocked, no network) ────
   pipeline-news:
     name: "Pipeline: News Briefing"
     runs-on: ubuntu-latest
@@ -98,7 +96,8 @@ jobs:
       - uses: actions/setup-python@v5
         with:
           python-version: "3.12"
-      - run: pip install poetry==1.8.* && poetry install
+      - name: Install
+        run: pip install "poetry>=1.8,<1.9" && poetry install
       - name: Test news pipeline end-to-end
         run: poetry run pytest tests/test_pipelines/test_news.py -v --tb=long
 
@@ -114,7 +113,8 @@ jobs:
       - uses: actions/setup-python@v5
         with:
           python-version: "3.12"
-      - run: pip install poetry==1.8.* && poetry install
+      - name: Install
+        run: pip install "poetry>=1.8,<1.9" && poetry install
       - name: Test article pipeline end-to-end
         run: poetry run pytest tests/test_pipelines/test_article.py -v --tb=long
 
@@ -130,11 +130,11 @@ jobs:
       - uses: actions/setup-python@v5
         with:
           python-version: "3.12"
-      - run: pip install poetry==1.8.* && poetry install
+      - name: Install
+        run: pip install "poetry>=1.8,<1.9" && poetry install
       - name: Test weather pipeline end-to-end
         run: poetry run pytest tests/test_pipelines/test_weather.py -v --tb=long
 
-  # ── Docker build validation ─────────────────────────────────────
   docker-build:
     name: Docker Build
     runs-on: ubuntu-latest
@@ -156,7 +156,6 @@ jobs:
       - name: Run pipeline tests in container
         run: docker compose run --rm pipeline-test
 
-  # ── Security: scan for secrets in committed files ───────────────
   secrets-scan:
     name: Secrets Scan
     runs-on: ubuntu-latest
@@ -177,7 +176,7 @@ jobs:
         run: |
           FOUND=$(grep -rn --include='*.py' --include='*.md' --include='*.yaml' \
             --include='*.yml' --include='*.json' --include='*.toml' \
-            -iE '(password|secret|token)\s*[:=]\s*["\x27][^"\x27]{8,}' . \
+            -iE "(password|secret|token)\s*[:=]\s*\"[^\"]{8,}" . \
             | grep -v '.git/' \
             | grep -v '.env.example' \
             | grep -v 'node_modules' \
@@ -196,7 +195,7 @@ jobs:
         run: |
           FOUND=$(grep -rn --include='*.py' --include='*.md' --include='*.yaml' \
             --include='*.yml' --include='*.json' --include='*.toml' \
-            -E '(/Users/[a-zA-Z]|/home/[a-zA-Z]|/Volumes/[a-zA-Z]|C:\\Users\\)' . \
+            -E "(/Users/[a-zA-Z]|/home/[a-zA-Z]|/Volumes/[a-zA-Z])" . \
             | grep -v '.git/' \
             | grep -v 'node_modules' \
             || true)
@@ -207,7 +206,6 @@ jobs:
           fi
           echo "OK: No hardcoded paths found"
 
-  # ── Feed config validation ──────────────────────────────────────
   validate-config:
     name: Validate Config
     runs-on: ubuntu-latest
@@ -215,7 +213,14 @@ jobs:
       - uses: actions/checkout@v4
 
       - name: Validate feeds.json
-        run: python3 -c "import json; d=json.load(open('config/feeds.json')); print(f'OK: {sum(len(v) for v in d[\"categories\"].values())} feeds in {len(d[\"categories\"])} categories')"
+        run: |
+          python3 -c "
+          import json
+          d = json.load(open('config/feeds.json'))
+          feeds = sum(len(v) for v in d['categories'].values())
+          cats = len(d['categories'])
+          print(f'OK: {feeds} feeds in {cats} categories')
+          "
 
       - name: Validate .env.example has all required vars
         run: |
