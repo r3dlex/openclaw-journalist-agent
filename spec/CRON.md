@@ -15,7 +15,12 @@ Update this file when tasks are added, changed, or retired.
 | 20:00 | Evening briefing | `pipeline news` + `pipeline weather 8pm` | Next day preview |
 | Sun 21:00 | Weekly weather | `pipeline weather sunday_9pm` | 7-day lookahead |
 
-All pipelines run via `docker compose run --rm pipeline <command>`.
+All 7 scheduled tasks are auto-executed by the **scheduler service** (ARCH-006).
+Start it with `docker compose up -d scheduler`. The scheduler uses the `schedule`
+library and runs pipelines in-process — no container startup overhead per task.
+
+For ad-hoc runs, use: `docker compose exec scheduler pipeline <command>`.
+One-shot fallback: `docker compose run --rm --profile cli pipeline <command>`.
 
 ## Handoff Schedule
 

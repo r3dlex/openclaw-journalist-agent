@@ -5,6 +5,7 @@ Usage:
     pipeline article <url>     — Extract article content from a URL
     pipeline weather <slot>    — Run weather briefing (6am|12pm|4pm|8pm|sunday_9pm)
     pipeline validate          — Validate configuration (feeds, env)
+    pipeline scheduler         — Start the long-running scheduler service
 """
 
 from __future__ import annotations
@@ -49,6 +50,9 @@ def main() -> None:
     # validate
     subparsers.add_parser("validate", help="Validate configuration")
 
+    # scheduler
+    subparsers.add_parser("scheduler", help="Start the long-running scheduler (blocks)")
+
     args = parser.parse_args()
 
     logging.basicConfig(
@@ -66,6 +70,10 @@ def main() -> None:
         print(run_weather_pipeline(args.slot, settings))
     elif args.command == "validate":
         _validate(settings)
+    elif args.command == "scheduler":
+        from pipeline_runner.scheduler import run_scheduler
+
+        run_scheduler(settings)
     else:
         parser.print_help()
         sys.exit(1)

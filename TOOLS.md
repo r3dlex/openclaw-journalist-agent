@@ -6,10 +6,14 @@ Skills define _how_ tools work. This file is for _your_ specifics.
 
 | Skill | Command | Cost Tier |
 |-------|---------|-----------|
-| `fetch_briefing` | `docker compose run --rm pipeline news` | Tier 1 (free) |
-| `read_article` | `docker compose run --rm pipeline article <url>` | Tier 1/2 |
-| `weather_forecast` | `docker compose run --rm pipeline weather <slot>` | Tier 1 (free) |
+| `fetch_briefing` | `docker compose exec scheduler pipeline news` | Tier 1 (free) |
+| `read_article` | `docker compose exec scheduler pipeline article <url>` | Tier 1/2 |
+| `weather_forecast` | `docker compose exec scheduler pipeline weather <slot>` | Tier 1 (free) |
 | `browse_url` | `openclaw browser navigate <url> && openclaw browser snapshot --json` | Tier 3 (fallback) |
+
+The **scheduler service** (ARCH-006) must be running: `docker compose up -d scheduler`.
+All skill commands execute instantly via `docker compose exec` (no container startup).
+One-shot fallback: `docker compose run --rm --profile cli pipeline <cmd>`.
 
 **Research order:** RSS first, then `read_article`, then `browse_url` only as last resort.
 

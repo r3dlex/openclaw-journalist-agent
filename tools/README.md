@@ -5,14 +5,20 @@ Zero-install Python pipeline runner for the Journalist agent.
 ## Quick Start
 
 ```bash
-# Build and test (zero-install)
-docker compose run --rm pipeline-test
+# Build and start the scheduler (recommended)
+docker compose up -d scheduler
 
-# Run a pipeline
-docker compose run --rm pipeline news
-docker compose run --rm pipeline article https://example.com/story
-docker compose run --rm pipeline weather 6am
-docker compose run --rm pipeline validate
+# Run ad-hoc commands via the scheduler (instant, no startup delay)
+docker compose exec scheduler pipeline news
+docker compose exec scheduler pipeline article https://example.com/story
+docker compose exec scheduler pipeline weather 6am
+docker compose exec scheduler pipeline validate
+
+# One-shot alternative (cli profile, cold start each time)
+docker compose run --rm --profile cli pipeline news
+
+# Build and test (zero-install)
+docker compose run --rm --profile test pipeline-test
 ```
 
 ## Architecture
@@ -35,6 +41,7 @@ pipeline_runner/
 ├── cli.py               # CLI entry point
 ├── config.py            # Configuration (from .env and feeds.json)
 ├── runner.py            # Core pipeline engine
+├── scheduler.py         # Long-running scheduler service (ARCH-006)
 ├── pipelines/           # Pre-built pipeline definitions
 │   ├── news.py          # News briefing pipeline
 │   ├── article.py       # Article extraction pipeline
@@ -51,7 +58,7 @@ pipeline_runner/
 
 ```bash
 # Unit tests (in Docker)
-docker compose run --rm pipeline-test
+docker compose run --rm --profile test pipeline-test
 
 # Local development (requires Poetry)
 cd tools

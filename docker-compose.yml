@@ -1,14 +1,36 @@
 services:
-  journalist:
-    build: .
+  # ── Long-running scheduler service ──────────────────────────────
+  # Runs pipelines on the cron schedule defined in spec/CRON.md.
+  # Start:  docker compose up -d scheduler
+  # Logs:   docker compose logs -f scheduler
+  # Stop:   docker compose down scheduler
+  # Ad-hoc: docker compose exec scheduler pipeline news
+  #         docker compose exec scheduler pipeline article <url>
+  scheduler:
+    build:
+      context: ./tools
+      target: production
     env_file: .env
     volumes:
-      - ./scripts:/app/scripts:ro
       - ./config:/app/config:ro
       - ${JOURNALIST_DATA_DIR:-.}/log:/app/log
       - ${JOURNALIST_DATA_DIR:-.}/reports:/app/reports
     working_dir: /app
+    command: ["scheduler"]
+    restart: unless-stopped
+    stop_grace_period: 30s
+    healthcheck:
+      test: ["CMD", "python", "-c", "import pipeline_runner; print('ok')"]
+      interval: 60s
+      timeout: 10s
+      retries: 3
 
+  # ── One-shot pipeline commands ──────────────────────────────────
+  # Use when the scheduler is NOT running, or in CI:
+  #   docker compose run --rm pipeline news
+  #   docker compose run --rm pipeline article <url>
+  #   docker compose run --rm pipeline weather 6am
+  #   docker compose run --rm pipeline validate
   pipeline:
     build:
       context: ./tools
@@ -19,7 +41,10 @@ services:
       - ${JOURNALIST_DATA_DIR:-.}/log:/app/log
       - ${JOURNALIST_DATA_DIR:-.}/reports:/app/reports
     working_dir: /app
+    profiles: ["cli"]
 
+  # ── Test runner ─────────────────────────────────────────────────
+  #   docker compose run --rm pipeline-test
   pipeline-test:
     build:
       context: ./tools
@@ -28,3 +53,17 @@ services:
     volumes:
       - ./config:/app/config:ro
     working_dir: /app
+    profiles: ["test"]
+
+  # ── Legacy scripts (pre-pipeline) ──────────────────────────────
+  #   docker compose run --rm journalist python scripts/fetch_news.py
+  journalist:
+    build: .
+    env_file: .env
+    volumes:
+      - ./scripts:/app/scripts:ro
+      - ./config:/app/config:ro
+      - ${JOURNALIST_DATA_DIR:-.}/log:/app/log
+      - ${JOURNALIST_DATA_DIR:-.}/reports:/app/reports
+    working_dir: /app
+    profiles: ["legacy"]

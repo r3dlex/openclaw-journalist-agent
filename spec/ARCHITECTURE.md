@@ -21,6 +21,7 @@ Each ADR documents the context, decision, consequences, and (optionally) enforce
 | `ARCH-003` | Pipeline Architecture | architecture |
 | `ARCH-004` | Inter-Agent Collaboration Protocol | architecture |
 | `ARCH-005` | Cost Management Strategy | architecture |
+| `ARCH-006` | Scheduler Service | architecture |
 
 ADRs live in `.archgate/adrs/`. To create a new one, follow the naming convention:
 `ARCH-NNN-short-slug.md` with YAML frontmatter (`id`, `title`, `domain`, `rules`).
@@ -76,11 +77,17 @@ Pipeline → [Step1 → Step2 → Step3] → PipelineResult
 | `article_extraction` | fetch_url → extract → handoff | Ad-hoc |
 | `weather_briefing` | fetch_weather → format → handoff | Cron |
 
-**Execution:**
+**Execution (via scheduler):**
 ```bash
-docker compose run --rm pipeline news
-docker compose run --rm pipeline article https://example.com
-docker compose run --rm pipeline weather 6am
+docker compose up -d scheduler                           # Start scheduler (auto-runs cron tasks)
+docker compose exec scheduler pipeline news              # Ad-hoc execution (instant)
+docker compose exec scheduler pipeline article https://example.com
+docker compose exec scheduler pipeline weather 6am
+```
+
+**Execution (one-shot, cli profile):**
+```bash
+docker compose run --rm --profile cli pipeline news
 ```
 
 ## Data Flow
@@ -97,6 +104,7 @@ docker compose run --rm pipeline weather 6am
 
 | Component | Skill name | Location | Runtime |
 |-----------|-----------|----------|---------|
+| Scheduler service | - | `tools/pipeline_runner/scheduler.py` | Docker (long-running, ARCH-006) |
 | Pipeline runner | - | `tools/pipeline_runner/` | Docker (Poetry) |
 | News fetcher | `fetch_briefing` | `scripts/fetch_news.py` | Docker container |
 | URL reader | `read_article` | `scripts/read_url.py` | Docker container |
@@ -128,11 +136,16 @@ See `ARCH-004` for the full protocol specification.
 
 All scripts and pipelines run inside Docker containers (zero-install):
 
-| Image | Purpose | Dockerfile |
-|-------|---------|-----------|
-| `journalist` | Legacy scripts | `./Dockerfile` |
-| `pipeline` | Pipeline runner | `tools/Dockerfile` |
-| `pipeline-test` | Test suite | `tools/Dockerfile` (test stage) |
+| Image / Service | Purpose | Dockerfile | Profile |
+|----------------|---------|-----------|---------|
+| `scheduler` | Long-running scheduler (ARCH-006) | `tools/Dockerfile` | default |
+| `pipeline` | One-shot pipeline runner | `tools/Dockerfile` | `cli` |
+| `pipeline-test` | Test suite | `tools/Dockerfile` (test stage) | `test` |
+| `journalist` | Legacy scripts | `./Dockerfile` | `legacy` |
+
+The **scheduler** service is the primary runtime. It auto-executes all 7 cron-scheduled
+tasks from `spec/CRON.md` using the `schedule` library and also accepts ad-hoc commands
+via `docker compose exec scheduler pipeline <cmd>`.
 
 ## Testing
 

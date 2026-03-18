@@ -6,7 +6,6 @@ from unittest.mock import MagicMock, patch
 
 from pipeline_runner.config import FeedConfig, PipelineSettings
 from pipeline_runner.pipelines.news import build_news_pipeline
-from pipeline_runner.steps.fetch import FeedEntry
 
 
 class TestNewsPipeline:
@@ -47,11 +46,13 @@ class TestNewsPipeline:
         mock_get.return_value = mock_response
 
         pipeline = build_news_pipeline(settings)
-        result = pipeline.run({
-            "settings": settings,
-            "feeds_config": feed_config,
-            "pipeline_name": "news_briefing",
-        })
+        result = pipeline.run(
+            {
+                "settings": settings,
+                "feeds_config": feed_config,
+                "pipeline_name": "news_briefing",
+            }
+        )
 
         assert result.success
         assert "briefing" in result.context

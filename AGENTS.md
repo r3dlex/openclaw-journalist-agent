@@ -102,6 +102,10 @@ Your skills are defined in `agent.yaml`:
 
 See `spec/ARCHITECTURE.md` for the full decision logic.
 
+The **scheduler service** (ARCH-006) runs all cron-scheduled pipelines automatically
+and provides instant ad-hoc execution via `docker compose exec scheduler pipeline <cmd>`.
+Start it with `docker compose up -d scheduler`.
+
 Scripts live in `scripts/` and run inside containers (zero-install).
 Keep environment-specific notes in `TOOLS.md`.
 

@@ -38,6 +38,7 @@ hands off results to the **Librarian** agent for archival.
 │   │   ├── cli.py       # CLI entry point
 │   │   ├── config.py    # Configuration management
 │   │   ├── runner.py    # Core pipeline engine
+│   │   ├── scheduler.py # Long-running scheduler service (ARCH-006)
 │   │   ├── pipelines/   # Pre-built pipeline definitions
 │   │   └── steps/       # Composable pipeline steps
 │   └── tests/           # Test suite (pytest)
@@ -49,7 +50,8 @@ hands off results to the **Librarian** agent for archival.
 │       ├── ARCH-002-zero-install-containerization.md
 │       ├── ARCH-003-pipeline-architecture.md
 │       ├── ARCH-004-inter-agent-collaboration.md
-│       └── ARCH-005-cost-management.md
+│       ├── ARCH-005-cost-management.md
+│       └── ARCH-006-scheduler-service.md
 ├── spec/                # Detailed specifications (progressive disclosure)
 │   ├── ARCHITECTURE.md  # System design and ADR index
 │   ├── PIPELINES.md     # Pipeline architecture spec
@@ -94,13 +96,25 @@ docker compose run --rm journalist python scripts/read_url.py <url>
 docker compose run --rm journalist python scripts/weather_forecast.py 6am
 ```
 
-**Pipeline runner** (recommended) — composable, testable pipelines:
+**Scheduler service** (recommended) — long-running service with auto-scheduled pipelines:
 
 ```bash
-docker compose run --rm pipeline news
-docker compose run --rm pipeline article https://example.com
-docker compose run --rm pipeline weather 6am
-docker compose run --rm pipeline validate
+# Start the scheduler (runs all cron-scheduled pipelines automatically)
+docker compose up -d scheduler
+
+# Run ad-hoc commands via the scheduler (instant, no container startup)
+docker compose exec scheduler pipeline news
+docker compose exec scheduler pipeline article https://example.com
+docker compose exec scheduler pipeline weather 6am
+docker compose exec scheduler pipeline validate
+```
+
+**One-shot pipeline** (alternative) — via the `cli` profile:
+
+```bash
+docker compose run --rm --profile cli pipeline news
+docker compose run --rm --profile cli pipeline article https://example.com
+docker compose run --rm --profile cli pipeline weather 6am
 ```
 
 The agent also has a `browse_url` skill that uses the OpenClaw browser relay
@@ -118,7 +132,7 @@ Run tests via Docker (zero-install):
 
 ```bash
 # Pipeline runner tests (pytest + ruff)
-docker compose run --rm pipeline-test
+docker compose run --rm --profile test pipeline-test
 
 # Local development
 cd tools && poetry install && poetry run pytest -v
@@ -158,7 +172,7 @@ For deeper topics, see `spec/`:
 1. Read this file and `spec/ARCHITECTURE.md`
 2. Copy `.env.example` to `.env` and configure
 3. Use `docker compose` for all script and pipeline execution
-4. Run tests before committing: `docker compose run --rm pipeline-test`
+4. Run tests before committing: `docker compose run --rm --profile test pipeline-test`
 5. Keep the Journalist agent autonomous - it makes its own decisions
 6. Document architectural decisions as ADRs in `.archgate/adrs/`
 7. Document learnings in `spec/LEARNINGS.md`

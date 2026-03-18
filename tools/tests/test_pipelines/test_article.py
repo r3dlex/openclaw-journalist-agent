@@ -5,7 +5,7 @@ from __future__ import annotations
 from unittest.mock import MagicMock, patch
 
 from pipeline_runner.config import PipelineSettings
-from pipeline_runner.pipelines.article import build_article_pipeline, run_article_pipeline
+from pipeline_runner.pipelines.article import build_article_pipeline
 
 
 class TestArticlePipeline:
@@ -46,11 +46,13 @@ class TestArticlePipeline:
         mock_get.return_value = mock_response
 
         pipeline = build_article_pipeline(settings, handoff=False)
-        result = pipeline.run({
-            "settings": settings,
-            "url": "https://example.com/article",
-            "pipeline_name": "article_extraction",
-        })
+        result = pipeline.run(
+            {
+                "settings": settings,
+                "url": "https://example.com/article",
+                "pipeline_name": "article_extraction",
+            }
+        )
 
         assert result.success
         assert "Test Article" in result.context.get("title", "")

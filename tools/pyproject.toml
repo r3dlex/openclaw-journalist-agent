@@ -14,6 +14,7 @@ requests = "^2.31"
 beautifulsoup4 = "^4.12"
 pydantic = "^2.0"
 pydantic-settings = "^2.0"
+schedule = "^1.2"
 
 [tool.poetry.group.dev.dependencies]
 pytest = "^8.0"
@@ -53,5 +54,5 @@ warn_return_any = true
 warn_unused_configs = true
 
 [[tool.mypy.overrides]]
-module = "feedparser.*"
+module = ["feedparser.*", "schedule.*"]
 ignore_missing_imports = true

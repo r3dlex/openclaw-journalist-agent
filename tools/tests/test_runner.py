@@ -4,9 +4,7 @@ from __future__ import annotations
 
 from typing import Any
 
-import pytest
-
-from pipeline_runner.runner import Pipeline, PipelineResult, StepResult, StepStatus
+from pipeline_runner.runner import Pipeline, StepStatus
 
 
 class PassStep:

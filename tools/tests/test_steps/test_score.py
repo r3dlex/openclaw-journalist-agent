@@ -2,7 +2,6 @@
 
 from __future__ import annotations
 
-from pipeline_runner.config import FeedConfig
 from pipeline_runner.steps.fetch import FeedEntry
 from pipeline_runner.steps.score import ScoreImportanceStep, _score_entry
 

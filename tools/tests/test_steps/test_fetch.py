@@ -27,13 +27,15 @@ class TestFetchUrlStep:
         mock_get.return_value = mock_response
 
         step = FetchUrlStep()
-        result = step.execute({
-            "url": "https://example.com",
-            "settings": PipelineSettings(
-                JOURNALIST_DATA_DIR=".",
-                FEEDS_FILE="config/feeds.json",
-            ),
-        })
+        result = step.execute(
+            {
+                "url": "https://example.com",
+                "settings": PipelineSettings(
+                    JOURNALIST_DATA_DIR=".",
+                    FEEDS_FILE="config/feeds.json",
+                ),
+            }
+        )
 
         assert result["raw_html"] == "<html><body>Test</body></html>"
         assert result["fetch_tier"] == 1
@@ -47,10 +49,12 @@ class TestFetchUrlStep:
 
         step = FetchUrlStep()
         with pytest.raises(Exception, match="404"):
-            step.execute({
-                "url": "https://example.com/notfound",
-                "settings": PipelineSettings(
-                    JOURNALIST_DATA_DIR=".",
-                    FEEDS_FILE="config/feeds.json",
-                ),
-            })
+            step.execute(
+                {
+                    "url": "https://example.com/notfound",
+                    "settings": PipelineSettings(
+                        JOURNALIST_DATA_DIR=".",
+                        FEEDS_FILE="config/feeds.json",
+                    ),
+                }
+            )

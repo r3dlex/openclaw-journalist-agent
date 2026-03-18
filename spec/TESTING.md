@@ -6,13 +6,14 @@ The pipeline runner has a comprehensive test suite. Run it via Docker (zero-inst
 
 ```bash
 # Build and run all tests + lint
-docker compose run --rm pipeline-test
+docker compose run --rm --profile test pipeline-test
 ```
 
 ### Test Coverage
 
 | Test File | What it tests |
 |-----------|---------------|
+| `tests/test_scheduler.py` | Scheduler service (9 tests: scheduling, execution, error handling) |
 | `tests/test_runner.py` | Core pipeline engine (pass/fail/skip/chain/context) |
 | `tests/test_config.py` | Configuration loading (FeedConfig, PipelineSettings) |
 | `tests/test_steps/test_score.py` | Importance scoring (keywords, boosts, caps) |
@@ -33,6 +34,21 @@ poetry run ruff check pipeline_runner/  # Lint
 poetry run mypy pipeline_runner/        # Type check
 ```
 
+## Scheduler Tests
+
+The scheduler service (ARCH-006) has 9 dedicated tests in `tests/test_scheduler.py`:
+
+```bash
+# Run scheduler tests only
+cd tools && poetry run pytest tests/test_scheduler.py -v
+```
+
+These tests cover:
+- Task registration and scheduling
+- Pipeline execution via scheduler
+- Error handling and recovery
+- Cron schedule alignment with `spec/CRON.md`
+
 ## Legacy Script Testing
 
 All legacy scripts run in Docker. No local Python install required.
@@ -42,13 +58,13 @@ All legacy scripts run in Docker. No local Python install required.
 docker compose build
 
 # Test news fetcher
-docker compose run --rm journalist python scripts/fetch_news.py
+docker compose run --rm --profile legacy journalist python scripts/fetch_news.py
 
 # Test URL reader
-docker compose run --rm journalist python scripts/read_url.py "https://en.wikipedia.org/wiki/Main_Page"
+docker compose run --rm --profile legacy journalist python scripts/read_url.py "https://en.wikipedia.org/wiki/Main_Page"
 
 # Test weather
-docker compose run --rm journalist python scripts/weather_forecast.py 6am
+docker compose run --rm --profile legacy journalist python scripts/weather_forecast.py 6am
 ```
 
 ## Pipeline Validation
@@ -56,7 +72,7 @@ docker compose run --rm journalist python scripts/weather_forecast.py 6am
 Validate configuration and connectivity:
 
 ```bash
-docker compose run --rm pipeline validate
+docker compose exec scheduler pipeline validate
 ```
 
 This checks:
@@ -83,19 +99,20 @@ openclaw browser navigate "https://en.wikipedia.org/wiki/Main_Page" && openclaw 
 
 ## Integration Testing
 
-1. **News pipeline**: `docker compose run --rm pipeline news` — verify briefing output
-2. **Article pipeline**: `docker compose run --rm pipeline article <url>` — verify extraction
-3. **Weather pipeline**: `docker compose run --rm pipeline weather 6am` — verify format
+1. **News pipeline**: `docker compose exec scheduler pipeline news` — verify briefing output
+2. **Article pipeline**: `docker compose exec scheduler pipeline article <url>` — verify extraction
+3. **Weather pipeline**: `docker compose exec scheduler pipeline weather 6am` — verify format
 4. **Browser fallback**: Test `browse_url` on a JS-heavy page
 5. **Librarian handoff**: Verify files appear in `$JOURNALIST_DATA_DIR/log/`
-6. **Pipeline validation**: `docker compose run --rm pipeline validate`
+6. **Pipeline validation**: `docker compose exec scheduler pipeline validate`
 
 ## Smoke Test Checklist
 
 - [ ] `docker compose build` succeeds (all services)
-- [ ] `docker compose run --rm pipeline-test` passes (all pipeline tests)
-- [ ] `docker compose run --rm pipeline news` returns a briefing
-- [ ] `docker compose run --rm pipeline validate` reports OK
+- [ ] `docker compose run --rm --profile test pipeline-test` passes (all pipeline tests)
+- [ ] `docker compose exec scheduler pipeline news` returns a briefing
+- [ ] `docker compose exec scheduler pipeline validate` reports OK
+- [ ] `docker compose up -d scheduler` starts without errors
 - [ ] `fetch_news.py` returns scored stories (legacy)
 - [ ] `read_url.py` extracts article content (legacy)
 - [ ] `weather_forecast.py` returns formatted weather (legacy)
@@ -134,5 +151,5 @@ CI will fail if:
 - **Pipeline spec**: `spec/PIPELINES.md`
 - **Architecture**: `spec/ARCHITECTURE.md`
 - **Troubleshooting**: `spec/TROUBLESHOOTING.md`
-- **ADR**: `.archgate/adrs/ARCH-003-pipeline-architecture.md`
+- **ADR**: `.archgate/adrs/ARCH-003-pipeline-architecture.md`, `.archgate/adrs/ARCH-006-scheduler-service.md`
 - **CI workflow**: `.github/workflows/ci.yml`

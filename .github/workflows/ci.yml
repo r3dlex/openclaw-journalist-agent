@@ -147,14 +147,17 @@ jobs:
       - name: Build legacy journalist image
         run: docker compose build journalist
 
-      - name: Build pipeline runner image
-        run: docker compose build pipeline
+      - name: Build scheduler image
+        run: docker compose build scheduler
 
-      - name: Build pipeline test image
-        run: docker compose build pipeline-test
+      - name: Build pipeline runner image (cli profile)
+        run: docker compose --profile cli build pipeline
+
+      - name: Build pipeline test image (test profile)
+        run: docker compose --profile test build pipeline-test
 
       - name: Run pipeline tests in container
-        run: docker compose run --rm pipeline-test
+        run: docker compose run --rm --profile test pipeline-test
 
   secrets-scan:
     name: Secrets Scan

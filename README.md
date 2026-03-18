@@ -25,18 +25,22 @@ cd openclaw-journalist-agent
 cp .env.example .env
 # Edit .env with your values
 
-# 2. Build and run
+# 2. Build and start the scheduler
 docker compose build
+docker compose up -d scheduler
 
-# Run via pipeline (recommended)
-docker compose run --rm pipeline news
-docker compose run --rm pipeline weather 6am
+# Run ad-hoc commands via the scheduler (instant, no startup delay)
+docker compose exec scheduler pipeline news
+docker compose exec scheduler pipeline weather 6am
+
+# Or one-shot via cli profile
+docker compose run --rm --profile cli pipeline news
 
 # Or legacy scripts
-docker compose run --rm journalist python scripts/fetch_news.py
+docker compose run --rm --profile legacy journalist python scripts/fetch_news.py
 
 # 3. Run tests
-docker compose run --rm pipeline-test
+docker compose run --rm --profile test pipeline-test
 ```
 
 ## Prerequisites
@@ -71,21 +75,35 @@ All configuration is via environment variables in `.env`. See `.env.example` for
 The agent follows a tiered research approach: RSS first (free), then direct HTTP extraction,
 then OpenClaw browser relay only as a last resort (highest credit cost).
 
-### Running Pipelines (Recommended)
+### Running via Scheduler (Recommended)
+
+The scheduler service runs all cron-scheduled pipelines automatically and also
+serves as the fastest way to run ad-hoc commands (no container startup overhead):
 
 ```bash
-docker compose run --rm pipeline news                    # News briefing
-docker compose run --rm pipeline article <url>           # Article extraction
-docker compose run --rm pipeline weather <slot>          # Weather briefing
-docker compose run --rm pipeline validate                # Validate config
+docker compose up -d scheduler                                  # Start scheduler
+docker compose exec scheduler pipeline news                     # News briefing
+docker compose exec scheduler pipeline article <url>            # Article extraction
+docker compose exec scheduler pipeline weather <slot>           # Weather briefing
+docker compose exec scheduler pipeline validate                 # Validate config
+```
+
+### Running One-Shot Pipelines
+
+Use the `cli` profile for standalone one-shot runs (cold start each time):
+
+```bash
+docker compose run --rm --profile cli pipeline news
+docker compose run --rm --profile cli pipeline article <url>
+docker compose run --rm --profile cli pipeline weather <slot>
 ```
 
 ### Running Legacy Scripts
 
 ```bash
-docker compose run --rm journalist python scripts/fetch_news.py
-docker compose run --rm journalist python scripts/read_url.py <url>
-docker compose run --rm journalist python scripts/weather_forecast.py <slot>
+docker compose run --rm --profile legacy journalist python scripts/fetch_news.py
+docker compose run --rm --profile legacy journalist python scripts/read_url.py <url>
+docker compose run --rm --profile legacy journalist python scripts/weather_forecast.py <slot>
 ```
 
 ## Architecture
@@ -100,6 +118,7 @@ Architecture decisions are tracked as ADRs in `.archgate/adrs/` following the
 | `ARCH-003` | Pipeline Architecture |
 | `ARCH-004` | Inter-Agent Collaboration Protocol |
 | `ARCH-005` | Cost Management Strategy |
+| `ARCH-006` | Scheduler Service |
 
 See `spec/ARCHITECTURE.md` for the full system design.
 
@@ -107,7 +126,7 @@ See `spec/ARCHITECTURE.md` for the full system design.
 
 ```bash
 # Run all pipeline tests (Docker, zero-install)
-docker compose run --rm pipeline-test
+docker compose run --rm --profile test pipeline-test
 
 # Local development
 cd tools && poetry install && poetry run pytest -v

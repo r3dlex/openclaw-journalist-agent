@@ -82,13 +82,26 @@ If Tier 1 fails, the agent should escalate to Tier 2/3 using `read_article` or `
 
 ## Running Pipelines
 
-### Via Docker (zero-install)
+### Via Scheduler (recommended)
+
+The scheduler service (ARCH-006) runs all cron-scheduled pipelines automatically.
+Ad-hoc commands execute instantly with no container startup overhead:
 
 ```bash
-docker compose run --rm pipeline news
-docker compose run --rm pipeline article https://example.com
-docker compose run --rm pipeline weather 6am
-docker compose run --rm pipeline validate
+docker compose up -d scheduler                                  # Start scheduler
+docker compose exec scheduler pipeline news                     # Ad-hoc run
+docker compose exec scheduler pipeline article https://example.com
+docker compose exec scheduler pipeline weather 6am
+docker compose exec scheduler pipeline validate
+```
+
+### Via Docker One-Shot (cli profile)
+
+```bash
+docker compose run --rm --profile cli pipeline news
+docker compose run --rm --profile cli pipeline article https://example.com
+docker compose run --rm --profile cli pipeline weather 6am
+docker compose run --rm --profile cli pipeline validate
 ```
 
 ### Via Poetry (development)
@@ -106,7 +119,7 @@ See `spec/TESTING.md` for the full test strategy.
 
 ```bash
 # Run all tests (Docker)
-docker compose run --rm pipeline-test
+docker compose run --rm --profile test pipeline-test
 
 # Run specific test
 cd tools && poetry run pytest tests/test_pipelines/test_news.py -v
@@ -135,7 +148,7 @@ These run on every push and PR. See `spec/TESTING.md` for the full CI matrix.
 ## Related
 
 - **Architecture:** `spec/ARCHITECTURE.md`
-- **ADRs:** `.archgate/adrs/ARCH-003-pipeline-architecture.md`
+- **ADRs:** `.archgate/adrs/ARCH-003-pipeline-architecture.md`, `.archgate/adrs/ARCH-006-scheduler-service.md`
 - **Testing:** `spec/TESTING.md`
 - **CI workflow:** `.github/workflows/ci.yml`
 - **Cron schedule:** `spec/CRON.md`

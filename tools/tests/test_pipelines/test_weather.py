@@ -59,11 +59,13 @@ class TestWeatherPipeline:
         mock_get.return_value = mock_response
 
         pipeline = build_weather_pipeline(settings)
-        result = pipeline.run({
-            "settings": settings,
-            "time_slot": "6am",
-            "pipeline_name": "weather_briefing",
-        })
+        result = pipeline.run(
+            {
+                "settings": settings,
+                "time_slot": "6am",
+                "pipeline_name": "weather_briefing",
+            }
+        )
 
         assert result.success
         briefing = result.context.get("weather_briefing", "")
