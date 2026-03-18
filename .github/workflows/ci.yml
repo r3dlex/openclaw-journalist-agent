@@ -151,13 +151,13 @@ jobs:
         run: docker compose build scheduler
 
       - name: Build pipeline runner image (cli profile)
-        run: docker compose --profile cli build pipeline
+        run: COMPOSE_PROFILES=cli docker compose build pipeline
 
       - name: Build pipeline test image (test profile)
-        run: docker compose --profile test build pipeline-test
+        run: COMPOSE_PROFILES=test docker compose build pipeline-test
 
       - name: Run pipeline tests in container
-        run: docker compose run --rm --profile test pipeline-test
+        run: COMPOSE_PROFILES=test docker compose run --rm pipeline-test
 
   secrets-scan:
     name: Secrets Scan
