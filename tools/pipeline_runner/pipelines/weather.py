@@ -74,6 +74,7 @@ def run_weather_pipeline(time_slot: str = "6am", settings: PipelineSettings | No
     )
 
     if result.success:
-        return result.context.get("weather_briefing", "No weather data.")
+        briefing: str = result.context.get("weather_briefing", "No weather data.")
+        return briefing
     else:
         return f"Weather pipeline failed:\n{result.summary()}"

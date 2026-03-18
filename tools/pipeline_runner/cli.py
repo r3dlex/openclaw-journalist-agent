@@ -99,8 +99,8 @@ def _validate(settings: PipelineSettings) -> None:
 
     if errors:
         print(f"\nValidation FAILED with {len(errors)} errors:")
-        for e in errors:
-            print(f"  - {e}")
+        for err in errors:
+            print(f"  - {err}")
         sys.exit(1)
     else:
         print("\nValidation OK")

@@ -46,6 +46,7 @@ def run_news_pipeline(settings: PipelineSettings | None = None) -> str:
     )
 
     if result.success:
-        return result.context.get("briefing", "No briefing generated.")
+        briefing: str = result.context.get("briefing", "No briefing generated.")
+        return briefing
     else:
         return f"Pipeline failed:\n{result.summary()}"

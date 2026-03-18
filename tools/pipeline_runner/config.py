@@ -8,7 +8,7 @@ from __future__ import annotations
 
 import json
 from pathlib import Path
-from typing import Any
+from typing import Any, cast
 
 from pydantic import Field
 from pydantic_settings import BaseSettings
@@ -66,30 +66,33 @@ class FeedConfig:
     @property
     def categories(self) -> dict[str, list[str]]:
         """Return feed categories mapping."""
-        return self._data.get("categories", {})
+        result: dict[str, list[str]] = self._data.get("categories", {})
+        return result
 
     @property
     def important_keywords(self) -> list[str]:
         """Return importance scoring keywords."""
-        return self._data.get("important_keywords", [])
+        result: list[str] = self._data.get("important_keywords", [])
+        return result
 
     @property
     def settings(self) -> dict[str, Any]:
         """Return feed settings."""
-        return self._data.get("settings", {})
+        result: dict[str, Any] = self._data.get("settings", {})
+        return result
 
     @property
     def max_entries_per_feed(self) -> int:
-        return self.settings.get("max_entries_per_feed", 5)
+        return cast(int, self.settings.get("max_entries_per_feed", 5))
 
     @property
     def importance_threshold(self) -> int:
-        return self.settings.get("importance_threshold_for_detail", 3)
+        return cast(int, self.settings.get("importance_threshold_for_detail", 3))
 
     @property
     def max_concurrent_fetchers(self) -> int:
-        return self.settings.get("max_concurrent_fetchers", 10)
+        return cast(int, self.settings.get("max_concurrent_fetchers", 10))
 
     @property
     def article_max_chars(self) -> int:
-        return self.settings.get("article_max_chars", 2000)
+        return cast(int, self.settings.get("article_max_chars", 2000))
