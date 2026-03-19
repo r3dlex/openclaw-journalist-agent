@@ -7,7 +7,12 @@ from unittest.mock import MagicMock, patch
 import schedule as schedule_lib
 
 from pipeline_runner.config import PipelineSettings
-from pipeline_runner.scheduler import register_schedule
+from pipeline_runner.scheduler import (
+    _already_ran_today,
+    _guarded_run,
+    _mark_ran,
+    register_schedule,
+)
 
 
 class TestRegisterSchedule:
@@ -99,3 +104,55 @@ class TestSchedulerHelpers:
         _run_news_and_weather("6am", settings)
         mock_news.assert_called_once_with(settings)
         mock_weather.assert_called_once_with("6am", settings)
+
+
+class TestRestartProtection:
+    """Tests for the scheduler restart-protection (state tracking)."""
+
+    def test_already_ran_today_false_when_empty(self) -> None:
+        state: dict[str, str] = {}
+        assert _already_ran_today("morning_briefing", state) is False
+
+    def test_already_ran_today_true_when_ran(self) -> None:
+        state: dict[str, str] = {}
+        _mark_ran("morning_briefing", state)
+        assert _already_ran_today("morning_briefing", state) is True
+
+    def test_already_ran_today_false_for_different_task(self) -> None:
+        state: dict[str, str] = {}
+        _mark_ran("morning_briefing", state)
+        assert _already_ran_today("news_08", state) is False
+
+    def test_already_ran_today_false_for_yesterday(self) -> None:
+        state: dict[str, str] = {"morning_briefing": "2025-01-01T06:00:00+00:00"}
+        assert _already_ran_today("morning_briefing", state) is False
+
+    @patch("pipeline_runner.scheduler._save_state")
+    def test_guarded_run_executes_when_not_ran(self, mock_save: MagicMock) -> None:
+        import pipeline_runner.scheduler as sched
+
+        old_state = sched._run_state
+        sched._run_state = {}
+        try:
+            fn = MagicMock()
+            _guarded_run("test_task", fn, "arg1", "arg2")
+            fn.assert_called_once_with("arg1", "arg2")
+        finally:
+            sched._run_state = old_state
+
+    @patch("pipeline_runner.scheduler._save_state")
+    def test_guarded_run_skips_when_already_ran(self, mock_save: MagicMock) -> None:
+        import pipeline_runner.scheduler as sched
+
+        old_state = sched._run_state
+        sched._run_state = {}
+        try:
+            fn = MagicMock()
+            _guarded_run("test_task", fn, "arg1")
+            fn.assert_called_once()
+            # Second call should be skipped
+            fn.reset_mock()
+            _guarded_run("test_task", fn, "arg1")
+            fn.assert_not_called()
+        finally:
+            sched._run_state = old_state
