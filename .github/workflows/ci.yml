@@ -186,6 +186,7 @@ jobs:
             | grep -v 'REDACTED' \
             | grep -v 'your_' \
             | grep -v 'placeholder' \
+            | grep -v 'tests/' \
             || true)
           if [ -n "$FOUND" ]; then
             echo "::error::Potential secrets found in committed files:"

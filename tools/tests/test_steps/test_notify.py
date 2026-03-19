@@ -17,7 +17,12 @@ class TestTelegramNotifyStep:
 
     def test_should_not_run_without_config(self) -> None:
         step = TelegramNotifyStep()
-        ctx: dict[str, object] = {"briefing": "hello", "settings": PipelineSettings()}
+        # Explicitly set empty tokens (PipelineSettings may load .env in CI)
+        settings = PipelineSettings(
+            TELEGRAM_BOT_TOKEN="",  # type: ignore[call-arg]
+            TELEGRAM_CHAT_ID="",  # type: ignore[call-arg]
+        )
+        ctx: dict[str, object] = {"briefing": "hello", "settings": settings}
         assert step.should_run(ctx) is False
 
     def test_should_run_with_config_and_briefing(self) -> None:
