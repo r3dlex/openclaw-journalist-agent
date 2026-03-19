@@ -73,9 +73,9 @@ Pipeline → [Step1 → Step2 → Step3] → PipelineResult
 
 | Pipeline | Steps | Trigger |
 |----------|-------|---------|
-| `news_briefing` | fetch_feeds → score → format → handoff | Cron |
-| `article_extraction` | fetch_url → extract → handoff | Ad-hoc |
-| `weather_briefing` | fetch_weather → format → handoff | Cron |
+| `news_briefing` | fetch_feeds → score → format → handoff → telegram_notify | Cron |
+| `article_extraction` | fetch_url → extract → handoff → telegram_notify | Ad-hoc |
+| `weather_briefing` | fetch_weather → format → handoff → telegram_notify | Cron |
 
 **Execution (via scheduler):**
 ```bash
@@ -96,8 +96,9 @@ docker compose run --rm --profile cli pipeline news
 [RSS Feeds]  ──┐
 [Web Crawl]  ──┤──→ [Pipeline Steps] ──→ [Briefing]
 [Ad-hoc URLs]──┘         │                    │
-                          │                    ├──→ User (via channel)
-                    [Importance Scoring]        └──→ Librarian (archival)
+                          │                    ├──→ Telegram (notification)
+                    [Importance Scoring]        ├──→ log/ (file logging)
+                                                └──→ Librarian (archival)
 ```
 
 ## Component Map
@@ -112,7 +113,8 @@ docker compose run --rm --profile cli pipeline news
 | Feed config | - | `config/feeds.json` | Static JSON |
 | Browser engine | - | `engine/` | Docker (Elixir, planned) |
 | OpenClaw browser | `browse_url` | `openclaw browser` | Host CLI (Tier 3 fallback) |
-| Logs | - | `$JOURNALIST_DATA_DIR/log/` | External volume |
+| Telegram notify | - | `tools/pipeline_runner/steps/notify.py` | Pipeline step (per-pipeline) |
+| Logs | - | `log/` + `$JOURNALIST_DATA_DIR/log/` | File logging with rotation |
 
 ## Inter-Agent Protocol (ARCH-004)
 

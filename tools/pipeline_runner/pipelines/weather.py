@@ -15,6 +15,7 @@ from pipeline_runner.config import PipelineSettings
 from pipeline_runner.runner import Pipeline
 from pipeline_runner.steps.format import FormatWeatherStep
 from pipeline_runner.steps.handoff import LibrarianHandoffStep
+from pipeline_runner.steps.notify import TelegramNotifyStep
 
 logger = logging.getLogger(__name__)
 
@@ -52,11 +53,13 @@ def build_weather_pipeline(settings: PipelineSettings | None = None) -> Pipeline
         1. fetch_weather — Get forecast from wttr.in
         2. format_weather — Produce readable Markdown
         3. librarian_handoff — Write to log and notify Librarian
+        4. telegram_notify — Send weather briefing to Telegram
     """
     pipeline = Pipeline("weather_briefing")
     pipeline.add_step(FetchWeatherStep())
     pipeline.add_step(FormatWeatherStep())
     pipeline.add_step(LibrarianHandoffStep())
+    pipeline.add_step(TelegramNotifyStep())
     return pipeline
 
 

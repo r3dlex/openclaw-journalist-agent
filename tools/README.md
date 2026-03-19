@@ -51,7 +51,8 @@ pipeline_runner/
     ├── extract.py        # HTML content extraction
     ├── score.py          # Importance scoring
     ├── format.py         # Output formatting
-    └── handoff.py        # Librarian handoff
+    ├── handoff.py        # Librarian handoff
+    └── notify.py         # Telegram notifications
 ```
 
 ## Testing
@@ -75,5 +76,18 @@ Managed via Poetry (`pyproject.toml`). Key dependencies:
 - `requests` — HTTP client
 - `beautifulsoup4` — HTML extraction
 - `pydantic` / `pydantic-settings` — Configuration management
+- `schedule` — Cron-like task scheduling (scheduler service)
 
 Dev dependencies: `pytest`, `ruff`, `mypy`
+
+## Logging
+
+All pipeline output is logged to `log/pipeline.log` with rotation (5MB, 5 backups).
+The `log/` folder is tracked in git via `.gitkeep` but file contents are gitignored.
+
+## Telegram Notifications
+
+When `TELEGRAM_BOT_TOKEN` and `TELEGRAM_CHAT_ID` are set in `.env`, every pipeline
+automatically sends its generated content to the configured Telegram chat.
+The `telegram_notify` step is the last step in each pipeline and is silently
+skipped when Telegram is not configured.

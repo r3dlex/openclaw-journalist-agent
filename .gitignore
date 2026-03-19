@@ -34,10 +34,13 @@ ENV/
 # --- Artifacts (generated at runtime) ---
 artifacts/
 
-# --- Logs & Data (runtime, stored per JOURNALIST_DATA_DIR) ---
-logs/
+# --- Runtime Data (stored per JOURNALIST_DATA_DIR) ---
 reports/
 data/
+
+# --- Log folder (tracked via .gitkeep, contents ignored) ---
+log/*
+!log/.gitkeep
 
 # --- OpenClaw workspace state (local only) ---
 .openclaw/
@@ -76,7 +79,6 @@ docker-compose.override.yml
 tools/.venv/
 
 # --- Misc ---
-*.log
 *.tmp
 *.bak
 .mypy_cache/

@@ -93,12 +93,19 @@ class FormatWeatherStep:
 
     def execute(self, context: dict[str, Any]) -> dict[str, Any]:
         data = context["weather_data"]
+        # API wraps response in 'data' key
+        if "data" in data:
+            data = data["data"]
         time_slot = context.get("time_slot", "6am")
 
         current = data.get("current_condition", [{}])[0]
-        location = data.get("nearest_area", [{}])[0]
-
-        area = location.get("areaName", [{}])[0].get("value", "Unknown")
+        nearest = data.get("nearest_area") or []
+        if nearest:
+            location = nearest[0]
+            area = location.get("areaName", [{}])[0].get("value", "Unknown")
+        else:
+            # Fallback: use request info or settings
+            area = "Stuttgart"  # fallback
         temp_c = current.get("temp_C", "?")
         feels_like = current.get("FeelsLikeC", "?")
         humidity = current.get("humidity", "?")

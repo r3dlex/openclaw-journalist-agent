@@ -33,6 +33,10 @@ class PipelineSettings(BaseSettings):
     # Optional API keys
     news_api_key: str = Field(default="", alias="NEWS_API_KEY")
 
+    # Telegram notifications
+    telegram_bot_token: str = Field(default="", alias="TELEGRAM_BOT_TOKEN")
+    telegram_chat_id: str = Field(default="", alias="TELEGRAM_CHAT_ID")
+
     model_config = {"env_file": ".env", "extra": "ignore"}
 
     @property

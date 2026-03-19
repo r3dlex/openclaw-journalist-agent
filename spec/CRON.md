@@ -26,8 +26,9 @@ One-shot fallback: `docker compose run --rm --profile cli pipeline <command>`.
 
 | Frequency | Action |
 |-----------|--------|
-| After each briefing | Pipeline auto-writes to `$JOURNALIST_DATA_DIR/log/` |
+| After each briefing | Pipeline auto-writes to `log/` and `$JOURNALIST_DATA_DIR/log/` |
 | After each briefing | Pipeline auto-sends handoff signal to Librarian |
+| After each briefing | Pipeline auto-sends Telegram notification (if configured) |
 | Daily (evening) | Summarize day's tier usage in handoff |
 | Weekly (Sunday) | Summary handoff to Librarian |
 

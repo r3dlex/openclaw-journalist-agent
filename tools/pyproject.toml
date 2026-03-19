@@ -27,6 +27,7 @@ types-beautifulsoup4 = "^4.12"
 
 [tool.poetry.scripts]
 pipeline = "pipeline_runner.cli:main"
+scheduler = "pipeline_runner.scheduler:run_scheduler"
 
 [build-system]
 requires = ["poetry-core>=1.0.0"]

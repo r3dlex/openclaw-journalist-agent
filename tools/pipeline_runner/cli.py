@@ -13,11 +13,37 @@ from __future__ import annotations
 import argparse
 import logging
 import sys
+from logging.handlers import RotatingFileHandler
 
 from pipeline_runner.config import PipelineSettings
 from pipeline_runner.pipelines.article import run_article_pipeline
 from pipeline_runner.pipelines.news import run_news_pipeline
 from pipeline_runner.pipelines.weather import run_weather_pipeline
+
+
+def _setup_logging(settings: PipelineSettings, *, verbose: bool = False) -> None:
+    """Configure logging to both console and log/ folder."""
+    level = logging.DEBUG if verbose else logging.INFO
+    fmt = "%(asctime)s [%(levelname)s] %(name)s: %(message)s"
+
+    # Console handler
+    console = logging.StreamHandler()
+    console.setLevel(level)
+    console.setFormatter(logging.Formatter(fmt))
+
+    # File handler — writes to log/ folder with rotation
+    log_dir = settings.log_dir
+    log_file = log_dir / "pipeline.log"
+    file_handler = RotatingFileHandler(
+        log_file, maxBytes=5 * 1024 * 1024, backupCount=5, encoding="utf-8"
+    )
+    file_handler.setLevel(logging.DEBUG)
+    file_handler.setFormatter(logging.Formatter(fmt))
+
+    root = logging.getLogger()
+    root.setLevel(logging.DEBUG)
+    root.addHandler(console)
+    root.addHandler(file_handler)
 
 
 def main() -> None:
@@ -55,12 +81,8 @@ def main() -> None:
 
     args = parser.parse_args()
 
-    logging.basicConfig(
-        level=logging.DEBUG if args.verbose else logging.INFO,
-        format="%(asctime)s [%(levelname)s] %(name)s: %(message)s",
-    )
-
     settings = PipelineSettings()
+    _setup_logging(settings, verbose=args.verbose)
 
     if args.command == "news":
         print(run_news_pipeline(settings))

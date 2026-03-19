@@ -16,14 +16,10 @@ services:
       - ${JOURNALIST_DATA_DIR:-.}/log:/app/log
       - ${JOURNALIST_DATA_DIR:-.}/reports:/app/reports
     working_dir: /app
+    entrypoint: ["python", "-m", "pipeline_runner.cli"]
     command: ["scheduler"]
     restart: unless-stopped
     stop_grace_period: 30s
-    healthcheck:
-      test: ["CMD", "python", "-c", "import pipeline_runner; print('ok')"]
-      interval: 60s
-      timeout: 10s
-      retries: 3
 
   # ── One-shot pipeline commands ──────────────────────────────────
   # Use when the scheduler is NOT running, or in CI:

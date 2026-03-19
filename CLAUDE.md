@@ -25,6 +25,8 @@ hands off results to the **Librarian** agent for archival.
 ├── .env.example         # Environment variable template
 ├── config/              # Runtime configuration (feeds, sources)
 │   └── feeds.json       # RSS feed definitions
+├── log/                 # Pipeline log output (.gitkeep tracked, contents ignored)
+│   └── .gitkeep
 ├── requirements.txt     # Python dependencies for legacy scripts
 ├── scripts/             # Legacy containerized scripts (see also tools/)
 │   ├── fetch_news.py    # RSS aggregator with importance scoring
@@ -40,7 +42,7 @@ hands off results to the **Librarian** agent for archival.
 │   │   ├── runner.py    # Core pipeline engine
 │   │   ├── scheduler.py # Long-running scheduler service (ARCH-006)
 │   │   ├── pipelines/   # Pre-built pipeline definitions
-│   │   └── steps/       # Composable pipeline steps
+│   │   └── steps/       # Composable pipeline steps (fetch, score, format, handoff, notify)
 │   └── tests/           # Test suite (pytest)
 ├── engine/              # Elixir headless browser engine (Tier 2, future)
 │   └── README.md        # Engine architecture notes
@@ -85,6 +87,7 @@ Key variables:
 - `USER_DISPLAY_NAME`, `USER_LOCATION`, etc. - User PII kept out of git
 - `WEATHER_LOCATION`, `WEATHER_COUNTRY` - Weather config
 - `NEWS_API_KEY` - Optional API key
+- `TELEGRAM_BOT_TOKEN`, `TELEGRAM_CHAT_ID` - Telegram notification delivery
 
 ## Scripts & Skills
 
@@ -163,7 +166,8 @@ For deeper topics, see `spec/`:
 
 - **NEVER** commit `.env`, credentials, API keys, or PII
 - User profile data is referenced via `$USER_DISPLAY_NAME` etc. in templates
-- The `.gitignore` excludes: `.env`, `artifacts/`, `logs/`, `memory/`, `.openclaw/`
+- The `.gitignore` excludes: `.env`, `artifacts/`, `reports/`, `memory/`, `.openclaw/`
+- The `log/` folder is tracked (via `.gitkeep`) but its contents are gitignored
 - Before committing, run: `git diff --cached` and check for secrets
 - CI will block merges if secrets or hardcoded paths are detected
 
