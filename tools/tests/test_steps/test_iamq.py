@@ -6,10 +6,12 @@ from unittest.mock import MagicMock, patch
 
 from pipeline_runner.config import PipelineSettings
 from pipeline_runner.steps.iamq import (
+    AGENT_METADATA,
     IAMQAnnounceStep,
     iamq_check_inbox,
     iamq_heartbeat,
     iamq_list_agents,
+    iamq_mark_message,
     iamq_register,
     iamq_send_message,
 )
@@ -124,7 +126,7 @@ class TestIAMQAnnounceStep:
 
 class TestIAMQHelpers:
     @patch("pipeline_runner.steps.iamq.requests.post")
-    def test_register(self, mock_post: MagicMock) -> None:
+    def test_register_sends_metadata(self, mock_post: MagicMock) -> None:
         mock_resp = MagicMock()
         mock_resp.raise_for_status = MagicMock()
         mock_post.return_value = mock_resp
@@ -132,6 +134,11 @@ class TestIAMQHelpers:
         settings = PipelineSettings(IAMQ_HTTP_URL="http://localhost:18790")  # type: ignore[call-arg]
         assert iamq_register(settings) is True
         mock_post.assert_called_once()
+        call_kwargs = mock_post.call_args
+        payload = call_kwargs.kwargs.get("json") or call_kwargs[1].get("json")
+        assert payload["agent_id"] == "journalist_agent"
+        assert payload["name"] == AGENT_METADATA["name"]
+        assert payload["capabilities"] == AGENT_METADATA["capabilities"]
 
     def test_register_no_url(self) -> None:
         settings = PipelineSettings(IAMQ_HTTP_URL="")  # type: ignore[call-arg]
@@ -196,3 +203,53 @@ class TestIAMQHelpers:
             settings, to="librarian_agent", subject="test", body="test"
         )
         assert msg_id is None
+
+    @patch("pipeline_runner.steps.iamq.requests.post")
+    def test_send_message_with_reply_to(self, mock_post: MagicMock) -> None:
+        mock_resp = MagicMock()
+        mock_resp.json.return_value = {"id": "reply-001"}
+        mock_resp.raise_for_status = MagicMock()
+        mock_post.return_value = mock_resp
+
+        settings = PipelineSettings(IAMQ_HTTP_URL="http://localhost:18790")  # type: ignore[call-arg]
+        msg_id = iamq_send_message(
+            settings,
+            to="mail_agent",
+            subject="Re: Research request",
+            body="Here are the findings",
+            msg_type="response",
+            reply_to="original-msg-uuid",
+        )
+        assert msg_id == "reply-001"
+        call_kwargs = mock_post.call_args
+        payload = call_kwargs.kwargs.get("json") or call_kwargs[1].get("json")
+        assert payload["replyTo"] == "original-msg-uuid"
+        assert payload["type"] == "response"
+
+    @patch("pipeline_runner.steps.iamq.requests.patch")
+    def test_mark_message(self, mock_patch: MagicMock) -> None:
+        mock_resp = MagicMock()
+        mock_resp.raise_for_status = MagicMock()
+        mock_patch.return_value = mock_resp
+
+        settings = PipelineSettings(IAMQ_HTTP_URL="http://localhost:18790")  # type: ignore[call-arg]
+        assert iamq_mark_message(settings, "msg-123", "acted") is True
+        mock_patch.assert_called_once()
+        call_url = mock_patch.call_args[0][0]
+        assert "messages/msg-123" in call_url
+
+    @patch("pipeline_runner.steps.iamq.requests.patch")
+    def test_mark_message_read(self, mock_patch: MagicMock) -> None:
+        mock_resp = MagicMock()
+        mock_resp.raise_for_status = MagicMock()
+        mock_patch.return_value = mock_resp
+
+        settings = PipelineSettings(IAMQ_HTTP_URL="http://localhost:18790")  # type: ignore[call-arg]
+        assert iamq_mark_message(settings, "msg-456", "read") is True
+        call_kwargs = mock_patch.call_args
+        payload = call_kwargs.kwargs.get("json") or call_kwargs[1].get("json")
+        assert payload["status"] == "read"
+
+    def test_mark_message_no_url(self) -> None:
+        settings = PipelineSettings(IAMQ_HTTP_URL="")  # type: ignore[call-arg]
+        assert iamq_mark_message(settings, "msg-123") is False

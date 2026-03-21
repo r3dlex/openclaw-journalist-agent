@@ -1,11 +1,56 @@
 # HEARTBEAT.md
 
-# Journalist periodic checks. Add tasks below when you want the agent
-# to check something on heartbeat. Keep this small to limit token burn.
-#
-# If nothing needs attention, reply HEARTBEAT_OK.
+Journalist periodic checks. On every heartbeat poll, run through these tasks
+in order. If nothing needs attention after all checks, reply `HEARTBEAT_OK`.
 
-# Uncomment and customize:
-# - [ ] Check for new high-priority RSS stories
-# - [ ] Review spec/TASK.md for pending one-shot tasks
-# - [ ] Weather update if approaching a scheduled slot
+## MQ Tasks (Inter-Agent Message Queue)
+
+The MQ is the primary channel for agent-to-agent communication.
+Service: `$IAMQ_HTTP_URL` (default `http://127.0.0.1:18790`).
+Protocol: see `openclaw-inter-agent-message-queue/spec/PROTOCOL.md`.
+
+- [x] **Send heartbeat** — keep yourself visible to other agents
+  ```
+  POST http://127.0.0.1:18790/heartbeat
+  {"agent_id": "journalist_agent"}
+  ```
+
+- [x] **Check inbox** — process unread messages from other agents
+  ```
+  GET http://127.0.0.1:18790/inbox/journalist_agent?status=unread
+  ```
+  For each unread message:
+  1. Mark as read: `PATCH /messages/{id} {"status": "read"}`
+  2. If `type: "request"` — act on it (research, summarize, etc.)
+  3. Reply through the MQ with `replyTo` threading:
+     ```
+     POST http://127.0.0.1:18790/send
+     {
+       "from": "journalist_agent",
+       "to": "{requesting_agent}",
+       "type": "response",
+       "subject": "Re: {original_subject}",
+       "body": "{your response}",
+       "replyTo": "{original_message_id}"
+     }
+     ```
+  4. Mark original as acted: `PATCH /messages/{id} {"status": "acted"}`
+  5. Also send to Telegram for human visibility (but MQ is primary)
+
+- [x] **Check broadcast** — read system-wide announcements
+  Broadcast messages appear in your inbox alongside direct messages.
+  Read them, acknowledge internally, mark as `read`.
+
+## Pipeline Tasks
+
+- [x] **Check for pending one-shot tasks** — review `spec/TASK.md`
+- [x] **Check for high-priority RSS stories** — if between scheduled runs
+  and something urgent may have dropped, consider an ad-hoc news fetch
+
+## Rules
+
+- MQ replies go through `POST /send` with `replyTo` — never only Telegram
+- Mark messages `read` immediately, `acted` after completing the request
+- Keep heartbeat responses fast — batch checks, don't deep-dive on heartbeat
+- If a research request will take time, reply with an acknowledgment first,
+  then send the full response when ready

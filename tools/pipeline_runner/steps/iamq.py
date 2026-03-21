@@ -21,6 +21,15 @@ logger = logging.getLogger(__name__)
 
 AGENT_ID = "journalist_agent"
 
+# Registration metadata — sent to IAMQ on startup for agent discovery
+AGENT_METADATA = {
+    "agent_id": AGENT_ID,
+    "name": "Journalist \U0001f4f0",
+    "emoji": "\U0001f4f0",
+    "description": "Investigative research, RSS monitoring, story analysis",
+    "capabilities": ["research", "web_crawl", "summarize", "rss_monitor"],
+}
+
 
 class IAMQAnnounceStep:
     """Announce pipeline completion to the IAMQ.
@@ -89,14 +98,14 @@ class IAMQAnnounceStep:
 
 
 def iamq_register(settings: PipelineSettings) -> bool:
-    """Register the journalist agent with the IAMQ service."""
+    """Register the journalist agent with the IAMQ service (with metadata)."""
     if not settings.iamq_http_url:
         return False
     try:
         url = f"{settings.iamq_http_url}/register"
-        resp = requests.post(url, json={"agent_id": AGENT_ID}, timeout=5)
+        resp = requests.post(url, json=AGENT_METADATA, timeout=5)
         resp.raise_for_status()
-        logger.info("IAMQ: registered as '%s'", AGENT_ID)
+        logger.info("IAMQ: registered as '%s' with metadata", AGENT_ID)
         return True
     except Exception:
         logger.warning("IAMQ: registration failed", exc_info=True)
@@ -159,13 +168,17 @@ def iamq_send_message(
     body: str,
     priority: str = "NORMAL",
     msg_type: str = "info",
+    reply_to: str | None = None,
 ) -> str | None:
-    """Send a direct message to another agent via IAMQ. Returns message ID."""
+    """Send a direct message to another agent via IAMQ. Returns message ID.
+
+    Set ``reply_to`` to the original message ``id`` to create a threaded reply.
+    """
     if not settings.iamq_http_url:
         return None
     try:
         url = f"{settings.iamq_http_url}/send"
-        payload = {
+        payload: dict[str, Any] = {
             "from": AGENT_ID,
             "to": to,
             "type": msg_type,
@@ -173,6 +186,8 @@ def iamq_send_message(
             "subject": subject,
             "body": body,
         }
+        if reply_to:
+            payload["replyTo"] = reply_to
         resp = requests.post(url, json=payload, timeout=5)
         resp.raise_for_status()
         data = resp.json()
@@ -182,3 +197,22 @@ def iamq_send_message(
     except Exception:
         logger.warning("IAMQ: send to '%s' failed", to, exc_info=True)
         return None
+
+
+def iamq_mark_message(
+    settings: PipelineSettings,
+    message_id: str,
+    status: str = "acted",
+) -> bool:
+    """Update a message's status (read, acted, archived)."""
+    if not settings.iamq_http_url:
+        return False
+    try:
+        url = f"{settings.iamq_http_url}/messages/{message_id}"
+        resp = requests.patch(url, json={"status": status}, timeout=5)
+        resp.raise_for_status()
+        logger.info("IAMQ: marked message %s as %s", message_id, status)
+        return True
+    except Exception:
+        logger.warning("IAMQ: mark message %s failed", message_id, exc_info=True)
+        return False
