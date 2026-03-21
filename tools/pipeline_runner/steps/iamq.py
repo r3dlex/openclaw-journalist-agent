@@ -22,12 +22,21 @@ logger = logging.getLogger(__name__)
 AGENT_ID = "journalist_agent"
 
 # Registration metadata — sent to IAMQ on startup for agent discovery
-AGENT_METADATA = {
+AGENT_METADATA: dict[str, Any] = {
     "agent_id": AGENT_ID,
-    "name": "Journalist \U0001f4f0",
+    "name": "Journalist",
     "emoji": "\U0001f4f0",
-    "description": "Investigative research, RSS monitoring, story analysis",
-    "capabilities": ["research", "web_crawl", "summarize", "rss_monitor"],
+    "description": "News gathering, article extraction, weather briefings, and content pipeline",
+    "capabilities": [
+        "article_extraction",
+        "news_briefing",
+        "weather_briefing",
+        "content_pipeline",
+        "research",
+        "web_crawl",
+        "summarize",
+        "rss_monitor",
+    ],
 }
 
 
@@ -103,7 +112,12 @@ def iamq_register(settings: PipelineSettings) -> bool:
         return False
     try:
         url = f"{settings.iamq_http_url}/register"
-        resp = requests.post(url, json=AGENT_METADATA, timeout=5)
+        payload = {**AGENT_METADATA}
+        # Include workspace path so other agents can locate our files
+        workspace = str(settings.workspace_dir.resolve())
+        if workspace and workspace != ".":
+            payload["workspace"] = workspace
+        resp = requests.post(url, json=payload, timeout=5)
         resp.raise_for_status()
         logger.info("IAMQ: registered as '%s' with metadata", AGENT_ID)
         return True

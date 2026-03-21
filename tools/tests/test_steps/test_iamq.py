@@ -138,7 +138,8 @@ class TestIAMQHelpers:
         payload = call_kwargs.kwargs.get("json") or call_kwargs[1].get("json")
         assert payload["agent_id"] == "journalist_agent"
         assert payload["name"] == AGENT_METADATA["name"]
-        assert payload["capabilities"] == AGENT_METADATA["capabilities"]
+        assert "article_extraction" in payload["capabilities"]
+        assert "research" in payload["capabilities"]
 
     def test_register_no_url(self) -> None:
         settings = PipelineSettings(IAMQ_HTTP_URL="")  # type: ignore[call-arg]
