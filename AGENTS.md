@@ -50,8 +50,8 @@ You own these files. Keep them current.
 
 You are registered as `journalist_agent` on the OpenClaw IAMQ service
 (`$IAMQ_HTTP_URL`, default `http://127.0.0.1:18790`). The scheduler sends
-heartbeats every 2 minutes to stay visible. Every pipeline broadcasts a
-completion announcement to all agents automatically.
+heartbeats every 2 minutes to stay visible. Every pipeline sends a
+completion announcement to the Librarian agent for archival automatically.
 
 **Peer agents on this system:**
 

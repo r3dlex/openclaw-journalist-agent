@@ -11,12 +11,26 @@ services:
       context: ./tools
       target: production
     env_file: .env
+    environment:
+      - PYTHONUNBUFFERED=1
+      # Container-internal path for data (logs, reports). Mounted below.
+      - JOURNALIST_DATA_DIR=/data/journalist
+      # Use Europe/Berlin so schedule library times match CRON.md times
+      - TZ=Europe/Berlin
+      # Use host.docker.internal to reach IAMQ on the Docker host (Mac/Windows)
+      - IAMQ_HTTP_URL=http://host.docker.internal:18790
+      # Mounted path for librarian workspace (container-internal path)
+      - LIBRARIAN_WORKSPACE_MOUNT=/app/librarian_workspace
     volumes:
       - ./config:/app/config:ro
-      - ${JOURNALIST_DATA_DIR:-.}/log:/app/log
-      - ${JOURNALIST_DATA_DIR:-.}/reports:/app/reports
+      # Data volumes on /data (avoids Docker Desktop metadata corruption on /app mounts)
+      # JOURNALIST_DATA_DIR in volumes: uses the .env value (host path), NOT the container override above
+      - ${JOURNALIST_DATA_DIR:-.}/log:/data/journalist/log:rw
+      - ${JOURNALIST_DATA_DIR:-.}/reports:/data/journalist/reports:rw
+      # Mount librarian workspace so handoff step can write signals
+      - ${LIBRARIAN_AGENT_WORKSPACE:-.}:/app/librarian_workspace:rw
     working_dir: /app
-    entrypoint: ["python", "-m", "pipeline_runner.cli"]
+    # Use the Dockerfile ENTRYPOINT (python -m pipeline_runner.cli) + scheduler arg
     command: ["scheduler"]
     restart: unless-stopped
     stop_grace_period: 30s
@@ -32,6 +46,9 @@ services:
       context: ./tools
       target: production
     env_file: .env
+    environment:
+      - PYTHONUNBUFFERED=1
+      - JOURNALIST_DATA_DIR=/app
     volumes:
       - ./config:/app/config:ro
       - ${JOURNALIST_DATA_DIR:-.}/log:/app/log

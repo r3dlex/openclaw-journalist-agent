@@ -146,7 +146,7 @@ All scripts and pipelines run inside Docker containers (zero-install):
 | `journalist` | Legacy scripts | `./Dockerfile` | `legacy` |
 
 The **scheduler** service is the primary runtime. It auto-executes all 7 cron-scheduled
-tasks from `spec/CRON.md` using the `schedule` library and also accepts ad-hoc commands
+tasks from `spec/CRON.md` plus an IAMQ heartbeat (8 total) using the `schedule` library and also accepts ad-hoc commands
 via `docker compose exec scheduler pipeline <cmd>`.
 
 ## Testing

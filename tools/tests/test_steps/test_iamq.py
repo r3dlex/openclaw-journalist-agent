@@ -70,7 +70,7 @@ class TestIAMQAnnounceStep:
         call_kwargs = mock_post.call_args
         payload = call_kwargs.kwargs.get("json") or call_kwargs[1].get("json")
         assert payload["from"] == "journalist_agent"
-        assert payload["to"] == "broadcast"
+        assert payload["to"] == "librarian_agent"
         assert "news_briefing" in payload["subject"]
 
     @patch("pipeline_runner.steps.iamq.requests.post")
@@ -92,7 +92,7 @@ class TestIAMQAnnounceStep:
         assert result["iamq_message_id"] is None
 
     @patch("pipeline_runner.steps.iamq.requests.post")
-    def test_truncates_long_content(self, mock_post: MagicMock) -> None:
+    def test_sends_full_content(self, mock_post: MagicMock) -> None:
         mock_resp = MagicMock()
         mock_resp.json.return_value = {"id": "msg-456"}
         mock_resp.raise_for_status = MagicMock()
@@ -110,7 +110,7 @@ class TestIAMQAnnounceStep:
 
         call_kwargs = mock_post.call_args
         payload = call_kwargs.kwargs.get("json") or call_kwargs[1].get("json")
-        assert len(payload["body"]) < 600  # 500 + truncation notice
+        assert len(payload["body"]) == 1000  # Full content sent, no truncation
 
     def test_empty_content_sets_announced_false(self) -> None:
         step = IAMQAnnounceStep()

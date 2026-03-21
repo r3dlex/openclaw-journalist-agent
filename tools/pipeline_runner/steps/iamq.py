@@ -43,8 +43,8 @@ AGENT_METADATA: dict[str, Any] = {
 class IAMQAnnounceStep:
     """Announce pipeline completion to the IAMQ.
 
-    Sends a message to ``broadcast`` (all agents) summarising the pipeline
-    output.  Gracefully degrades when the IAMQ service is unreachable —
+    Sends the full briefing content to the Librarian agent for archival.
+    Gracefully degrades when the IAMQ service is unreachable —
     a pipeline should never fail because the message queue is down.
 
     Context in:  briefing | weather_briefing | content (str), pipeline_name
@@ -71,18 +71,14 @@ class IAMQAnnounceStep:
             context["iamq_message_id"] = None
             return context
 
-        # Truncate for MQ — full content goes via handoff files
-        summary = content[:500]
-        if len(content) > 500:
-            summary += "\n\n... (truncated, full output in log/)"
-
+        # Send full content to Librarian specifically
         payload = {
             "from": AGENT_ID,
-            "to": "broadcast",
+            "to": "librarian_agent",
             "type": "info",
             "priority": "NORMAL",
-            "subject": f"Pipeline completed: {pipeline_name}",
-            "body": summary,
+            "subject": f"News Briefing: {pipeline_name}",
+            "body": content,
         }
 
         try:

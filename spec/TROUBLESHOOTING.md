@@ -49,8 +49,8 @@
 ### Scheduled tasks not firing
 - Verify the scheduler is running: `docker compose ps scheduler`
 - Check scheduler logs for registration messages: `docker compose logs scheduler | grep schedule`
-- Compare task times with `spec/CRON.md` — the scheduler runs 7 tasks matching that spec
-- Time zone mismatch: the scheduler uses the container's TZ (set via `TZ` env var in `.env`)
+- Compare task times with `spec/CRON.md` — the scheduler runs 8 tasks (7 pipeline + 1 IAMQ heartbeat)
+- Time zone mismatch: the scheduler uses UTC internally — ensure the container TZ matches your schedule times (set via `TZ` env var in docker-compose or `.env`)
 
 ### Ad-hoc `docker compose exec` fails
 - The scheduler container must be running: `docker compose up -d scheduler`
@@ -59,6 +59,11 @@
 
 ### Scheduler crashes or restarts
 - Check logs: `docker compose logs --tail=50 scheduler`
+- **PYTHONUNBUFFERED must be set:** Without this env var, Python buffers stdout fully when no TTY is attached. The Docker log driver sees no output and may kill the process. Fix in docker-compose.yml:
+  ```yaml
+  environment:
+    - PYTHONUNBUFFERED=1
+  ```
 - The scheduler has error isolation per task — one failing pipeline should not crash the service
 - If persistent crashes, check `tools/pipeline_runner/scheduler.py` for the error handler
 

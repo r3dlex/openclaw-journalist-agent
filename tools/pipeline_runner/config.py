@@ -39,6 +39,9 @@ class PipelineSettings(BaseSettings):
 
     # Inter-Agent Message Queue (IAMQ)
     iamq_http_url: str = Field(default="http://127.0.0.1:18790", alias="IAMQ_HTTP_URL")
+
+    # Mounted path for librarian workspace (when running in Docker)
+    librarian_workspace_mount: Path = Field(default=Path(""), alias="LIBRARIAN_WORKSPACE_MOUNT")
     iamq_agent_id: str = Field(default="journalist_agent", alias="IAMQ_AGENT_ID")
 
     model_config = {"env_file": ".env", "extra": "ignore"}

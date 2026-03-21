@@ -86,7 +86,7 @@ docker compose exec scheduler pipeline article <url>  # reuses running container
 
 **Mitigation:**
 - Memory footprint is minimal (Python idle + schedule library)
-- Tests validate that register_schedule() creates exactly 7 tasks matching CRON.md
+- Tests validate that register_schedule() creates exactly 8 tasks (7 from CRON.md + 1 IAMQ heartbeat)
 
 ## References
 

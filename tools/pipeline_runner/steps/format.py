@@ -51,8 +51,7 @@ class FormatBriefingStep:
             lines.append("## ⚡ Top Stories")
             lines.append("")
             for i, s in enumerate(top, 1):
-                score_bar = "+" * min(s.score, 10)
-                lines.append(f"{i}. [{score_bar}] **{s.entry.title}**")
+                lines.append(f"{i}. **{s.entry.title}**")
                 if s.entry.summary:
                     lines.append(f"   {s.entry.summary[:200]}")
                 lines.append(f"   Source: {s.entry.link}")
@@ -123,7 +122,7 @@ class FormatBriefingStep:
                 lines.append(f"### {cat}")
                 lines.append("")
                 for s in entries[: self.max_per_category]:
-                    lines.append(f"- **{s.entry.title}** (score: {s.score})")
+                    lines.append(f"- **{s.entry.title}**")
                     lines.append(f"  {s.entry.link}")
                 lines.append("")
 
@@ -136,7 +135,7 @@ class FormatBriefingStep:
                 lines.append(f"### {cat}")
                 lines.append("")
                 for s in entries[: self.max_per_category]:
-                    lines.append(f"- **{s.entry.title}** (score: {s.score})")
+                    lines.append(f"- **{s.entry.title}**")
                     lines.append(f"  {s.entry.link}")
                 lines.append("")
 
@@ -149,7 +148,7 @@ class FormatBriefingStep:
             lines.append(f"## {cat}")
             lines.append("")
             for s in entries[: self.max_per_category]:
-                lines.append(f"- **{s.entry.title}** (score: {s.score})")
+                lines.append(f"- **{s.entry.title}**")
                 lines.append(f"  {s.entry.link}")
             lines.append("")
         return lines

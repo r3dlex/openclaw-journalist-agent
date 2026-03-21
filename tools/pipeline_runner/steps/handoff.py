@@ -57,7 +57,8 @@ class LibrarianHandoffStep:
         metadata_path.write_text(json.dumps(metadata, indent=2), encoding="utf-8")
 
         # If librarian workspace is configured, write a handoff signal
-        librarian_ws = settings.librarian_agent_workspace
+        # Prefer mounted path (for Docker) over host path
+        librarian_ws = settings.librarian_workspace_mount or settings.librarian_agent_workspace
         if librarian_ws and librarian_ws.exists():
             inbox = librarian_ws / "inbox"
             inbox.mkdir(parents=True, exist_ok=True)

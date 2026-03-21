@@ -101,6 +101,10 @@ def main() -> None:
         sys.exit(1)
 
 
+if __name__ == "__main__":
+    main()
+
+
 def _validate(settings: PipelineSettings) -> None:
     """Validate configuration files and environment."""
     from pipeline_runner.config import FeedConfig
