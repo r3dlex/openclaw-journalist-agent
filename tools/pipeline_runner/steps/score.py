@@ -1,7 +1,7 @@
 """Importance scoring step — rank entries by relevance.
 
-Scores stories 0-10 based on keyword matching. Higher scores indicate
-stories the user is more likely to care about.
+Scores stories 0-10 based on keyword matching and domain priority.
+Higher scores indicate stories the user is more likely to care about.
 See ARCH-001 for how scoring feeds into the tiered research pipeline.
 """
 
@@ -21,6 +21,11 @@ BOOST_CRITICAL = 3  # breaking, exclusive
 BOOST_HIGH = 2  # urgent, war, crisis
 BOOST_NORMAL = 1  # standard keyword match
 
+# Domain priority adds a fractional boost (0.0-1.0) used only for sorting.
+# This doesn't inflate keyword scores but ensures high-priority domains
+# sort above equal-keyword-score entries from lower-priority domains.
+DOMAIN_PRIORITY_WEIGHT = 0.1
+
 
 @dataclass
 class ScoredEntry:
@@ -29,10 +34,11 @@ class ScoredEntry:
     entry: FeedEntry
     score: int
     matched_keywords: list[str]
+    domain_priority: int = 5
 
 
 class ScoreImportanceStep:
-    """Score feed entries by importance using keyword matching.
+    """Score feed entries by importance using keyword matching + domain priority.
 
     Context in:  entries (list[FeedEntry]), feeds_config (FeedConfig)
     Context out: scored_entries (list[ScoredEntry])
@@ -48,12 +54,28 @@ class ScoreImportanceStep:
         feed_config: FeedConfig = context["feeds_config"]
         keywords = feed_config.important_keywords
 
+        # Build category → domain priority lookup
+        cat_domain = feed_config.domain_for_category
+        domain_prio = feed_config.domain_priority
+
         scored: list[ScoredEntry] = []
         for entry in entries:
             score, matched = _score_entry(entry, keywords)
-            scored.append(ScoredEntry(entry=entry, score=score, matched_keywords=matched))
+            dp = _domain_priority_for(entry.category, cat_domain, domain_prio)
+            scored.append(
+                ScoredEntry(
+                    entry=entry,
+                    score=score,
+                    matched_keywords=matched,
+                    domain_priority=dp,
+                )
+            )
 
-        scored.sort(key=lambda s: s.score, reverse=True)
+        # Sort by keyword score (primary), then domain priority (secondary)
+        scored.sort(
+            key=lambda s: (s.score, s.domain_priority * DOMAIN_PRIORITY_WEIGHT),
+            reverse=True,
+        )
         context["scored_entries"] = scored
 
         high_count = sum(1 for s in scored if s.score >= feed_config.importance_threshold)
@@ -84,3 +106,13 @@ def _score_entry(entry: FeedEntry, keywords: list[str]) -> tuple[int, list[str]]
                 score += BOOST_NORMAL
 
     return min(score, 10), matched
+
+
+def _domain_priority_for(
+    category: str,
+    cat_domain: dict[str, str],
+    domain_prio: dict[str, int],
+) -> int:
+    """Look up domain priority for a category. Default 5 (mid)."""
+    domain_key = cat_domain.get(category, "")
+    return domain_prio.get(domain_key, 5)

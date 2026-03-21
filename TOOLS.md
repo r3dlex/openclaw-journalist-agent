@@ -21,9 +21,28 @@ Pipelines are composable and testable. See `spec/PIPELINES.md` for how they work
 
 ## Research Sources
 
-- RSS feeds: configured in `config/feeds.json`
+- RSS feeds: configured in `config/feeds.json` (126 feeds across 23 categories in 7 domains)
 - Knowledge: Grokipedia (`grokipedia.com`), Wikipedia, and other public sources
 - Web: headless browser engine (see `engine/`), or OpenClaw browser relay (Tier 3 fallback)
+
+## Inter-Agent Message Queue (IAMQ)
+
+The IAMQ service at `$IAMQ_HTTP_URL` (default `http://127.0.0.1:18790`) connects
+all OpenClaw agents. The scheduler auto-registers on startup and sends heartbeats
+every 2 minutes. Every pipeline announces its completion to the queue.
+
+```bash
+# Check your inbox
+curl http://127.0.0.1:18790/inbox/journalist_agent?status=unread
+
+# List online agents
+curl http://127.0.0.1:18790/agents
+
+# Send a message to another agent
+curl -X POST http://127.0.0.1:18790/send \
+  -H "Content-Type: application/json" \
+  -d '{"from":"journalist_agent","to":"librarian_agent","type":"request","priority":"NORMAL","subject":"...","body":"..."}'
+```
 
 ## Environment-Specific Notes
 

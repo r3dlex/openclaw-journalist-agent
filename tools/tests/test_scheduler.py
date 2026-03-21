@@ -24,9 +24,9 @@ class TestRegisterSchedule:
         """Clear the schedule after each test."""
         schedule_lib.clear()
 
-    def test_registers_seven_tasks(self, settings: PipelineSettings) -> None:
+    def test_registers_eight_tasks(self, settings: PipelineSettings) -> None:
         tasks = register_schedule(settings)
-        assert len(tasks) == 7
+        assert len(tasks) == 8
 
     def test_task_names(self, settings: PipelineSettings) -> None:
         tasks = register_schedule(settings)
@@ -41,8 +41,8 @@ class TestRegisterSchedule:
 
     def test_schedule_jobs_registered(self, settings: PipelineSettings) -> None:
         register_schedule(settings)
-        # schedule library should have 7 jobs
-        assert len(schedule_lib.get_jobs()) == 7
+        # schedule library should have 8 jobs (7 pipelines + 1 IAMQ heartbeat)
+        assert len(schedule_lib.get_jobs()) == 8
 
     def test_task_schedule_descriptions(self, settings: PipelineSettings) -> None:
         tasks = register_schedule(settings)

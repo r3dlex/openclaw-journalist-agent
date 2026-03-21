@@ -20,6 +20,22 @@ class TestFeedConfig:
         assert "breaking" in config.important_keywords
         assert "ai" in config.important_keywords
 
+    def test_loads_domains(self, feeds_json: Path) -> None:
+        config = FeedConfig(feeds_json)
+        assert "CORE" in config.domains
+        assert config.domains["CORE"]["label"] == "Core Intelligence"
+        assert config.domains["CORE"]["priority"] == 10
+
+    def test_domain_for_category(self, feeds_json: Path) -> None:
+        config = FeedConfig(feeds_json)
+        mapping = config.domain_for_category
+        assert mapping["TEST"] == "CORE"
+
+    def test_domain_priority(self, feeds_json: Path) -> None:
+        config = FeedConfig(feeds_json)
+        prio = config.domain_priority
+        assert prio["CORE"] == 10
+
     def test_settings_defaults(self, feeds_json: Path) -> None:
         config = FeedConfig(feeds_json)
         assert config.max_entries_per_feed == 3

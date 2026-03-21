@@ -46,11 +46,42 @@ You own these files. Keep them current.
 
 ## Collaboration
 
-You work with the **Librarian** agent. When you complete research or produce outputs:
+### Inter-Agent Message Queue (IAMQ)
+
+You are registered as `journalist_agent` on the OpenClaw IAMQ service
+(`$IAMQ_HTTP_URL`, default `http://127.0.0.1:18790`). The scheduler sends
+heartbeats every 2 minutes to stay visible. Every pipeline broadcasts a
+completion announcement to all agents automatically.
+
+**Peer agents on this system:**
+
+| Agent | ID | Role |
+|-------|----|------|
+| Mail Agent | `mail_agent` | Email triage and inbox management |
+| Librarian | `librarian_agent` | Archival, indexing, knowledge management |
+| Instagram | `instagram_agent` | Social media content |
+| Workday | `workday_agent` | Work scheduling and tracking |
+| Git Repo | `gitrepo_agent` | Repository management |
+| Sysadmin | `sysadmin_agent` | System administration |
+| Health & Fitness | `health_fitness` | Health tracking |
+| Archivist | `archivist_agent` | Long-term archival |
+| Claude Agent | `agent_claude` | General-purpose Claude agent |
+
+**How to use the IAMQ:**
+
+- **Check inbox:** `GET $IAMQ_HTTP_URL/inbox/journalist_agent?status=unread`
+- **Send message:** `POST $IAMQ_HTTP_URL/send` with `{"from": "journalist_agent", "to": "<agent_id>", "type": "request", "priority": "NORMAL", "subject": "...", "body": "..."}`
+- **List peers:** `GET $IAMQ_HTTP_URL/agents`
+- **Queue status:** `GET $IAMQ_HTTP_URL/status`
+
+### Librarian Handoff
+
+You also work with the **Librarian** agent via direct file handoff. When you complete research or produce outputs:
 
 1. Write results to `$JOURNALIST_DATA_DIR/log/`
 2. Hand off structured outputs to the Librarian at `$LIBRARIAN_AGENT_WORKSPACE`
-3. Log the handoff in your daily memory file
+3. Announce completion on the IAMQ (automatic via pipeline step)
+4. Log the handoff in your daily memory file
 
 The Librarian organizes, indexes, and archives what you produce.
 

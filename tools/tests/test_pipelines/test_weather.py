@@ -9,14 +9,20 @@ from pipeline_runner.pipelines.weather import build_weather_pipeline
 
 
 class TestWeatherPipeline:
-    def test_pipeline_has_four_steps(self) -> None:
+    def test_pipeline_has_five_steps(self) -> None:
         pipeline = build_weather_pipeline()
-        assert len(pipeline._steps) == 4
+        assert len(pipeline._steps) == 5
 
     def test_pipeline_step_names(self) -> None:
         pipeline = build_weather_pipeline()
         names = [s.name for s in pipeline._steps]
-        assert names == ["fetch_weather", "format_weather", "librarian_handoff", "telegram_notify"]
+        assert names == [
+            "fetch_weather",
+            "format_weather",
+            "librarian_handoff",
+            "telegram_notify",
+            "iamq_announce",
+        ]
 
     @patch("pipeline_runner.pipelines.weather.requests.get")
     def test_end_to_end_with_mock_api(

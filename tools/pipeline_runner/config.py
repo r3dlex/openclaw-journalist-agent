@@ -37,6 +37,9 @@ class PipelineSettings(BaseSettings):
     telegram_bot_token: str = Field(default="", alias="TELEGRAM_BOT_TOKEN")
     telegram_chat_id: str = Field(default="", alias="TELEGRAM_CHAT_ID")
 
+    # Inter-Agent Message Queue (IAMQ)
+    iamq_http_url: str = Field(default="http://127.0.0.1:18790", alias="IAMQ_HTTP_URL")
+
     model_config = {"env_file": ".env", "extra": "ignore"}
 
     @property
@@ -72,6 +75,32 @@ class FeedConfig:
         """Return feed categories mapping."""
         result: dict[str, list[str]] = self._data.get("categories", {})
         return result
+
+    @property
+    def domains(self) -> dict[str, dict[str, Any]]:
+        """Return domain groupings for categories.
+
+        Each domain maps to:
+            label (str): Human-readable name
+            priority (int): Domain priority (1-10)
+            categories (list[str]): Category keys belonging to this domain
+        """
+        result: dict[str, dict[str, Any]] = self._data.get("domains", {})
+        return result
+
+    @property
+    def domain_for_category(self) -> dict[str, str]:
+        """Return a reverse mapping: category -> domain key."""
+        mapping: dict[str, str] = {}
+        for domain_key, domain_info in self.domains.items():
+            for cat in domain_info.get("categories", []):
+                mapping[cat] = domain_key
+        return mapping
+
+    @property
+    def domain_priority(self) -> dict[str, int]:
+        """Return domain key -> priority mapping."""
+        return {key: int(info.get("priority", 5)) for key, info in self.domains.items()}
 
     @property
     def important_keywords(self) -> list[str]:

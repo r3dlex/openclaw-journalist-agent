@@ -1,54 +1,235 @@
 {
+  "domains": {
+    "CORE": {
+      "label": "Core Intelligence",
+      "priority": 10,
+      "categories": ["BREAKING / HIGH PRIORITY", "WORLD NEWS", "KNOWLEDGE BASES"]
+    },
+    "TECH & AI": {
+      "label": "Technology & Artificial Intelligence",
+      "priority": 9,
+      "categories": ["AI & MODELS", "AI CHINA", "TECH & DEV", "LINUX & OPEN SOURCE"]
+    },
+    "ECONOMY": {
+      "label": "Economy & Markets",
+      "priority": 8,
+      "categories": ["ECONOMY & MARKETS"]
+    },
+    "REGIONS": {
+      "label": "Regional Intelligence",
+      "priority": 8,
+      "categories": ["GERMANY & EUROPE", "EUROPEAN UNION", "BRAZIL & LATAM"]
+    },
+    "INDUSTRIES": {
+      "label": "Industry Watch",
+      "priority": 7,
+      "categories": ["AEC INDUSTRY", "MEDICAL", "AEROSPACE", "AUTOMOBILE", "MARKETING & SOCIAL", "HR & SKILLS"]
+    },
+    "STARTUPS & VC": {
+      "label": "Startups & Venture Capital",
+      "priority": 7,
+      "categories": ["STARTUPS GLOBAL", "STARTUPS DE & EU", "STARTUPS LATAM & PT"]
+    },
+    "LIFESTYLE": {
+      "label": "Lifestyle & Commerce",
+      "priority": 5,
+      "categories": ["TRAVEL & DESTINATIONS", "SHOPPING"]
+    }
+  },
   "categories": {
     "BREAKING / HIGH PRIORITY": [
       "https://www.politico.eu/feed/",
-      "http://feeds.bbci.co.uk/news/world/rss.xml"
+      "http://feeds.bbci.co.uk/news/world/rss.xml",
+      "https://apnews.com/index.rss",
+      "https://www.reuters.com/rssFeed/worldNews",
+      "https://www.aljazeera.com/xml/rss/all.xml"
     ],
     "AI & MODELS": [
       "https://openai.com/blog/rss.xml",
       "https://www.anthropic.com/rss.xml",
       "https://blog.google/technology/ai/rss",
       "https://huggingface.co/blog/feed.xml",
-      "https://www.x.ai/blog"
+      "https://www.x.ai/blog",
+      "https://ai.meta.com/blog/rss/",
+      "https://www.technologyreview.com/feed/",
+      "https://spectrum.ieee.org/feeds/topic/artificial-intelligence.rss",
+      "https://syncedreview.com/feed/"
+    ],
+    "AI CHINA": [
+      "https://www.scmp.com/rss/4/feed",
+      "https://technode.com/feed/",
+      "https://pandaily.com/feed/"
     ],
     "TECH & DEV": [
       "http://feeds.feedburner.com/TechCrunch/",
       "https://feeds.arstechnica.com/arstechnica/index",
       "https://www.theverge.com/rss/index.xml",
-      "https://slashdot.org/rssheadlines.xml"
+      "https://slashdot.org/rssheadlines.xml",
+      "https://news.ycombinator.com/rss"
     ],
     "LINUX & OPEN SOURCE": [
       "https://www.phoronix.com/rss.php",
       "https://www.linuxfoundation.org/feed",
       "https://kernel.org/feed.atom"
     ],
+    "ECONOMY & MARKETS": [
+      "https://www.marketwatch.com/rss/topstories",
+      "https://feeds.content.dowjones.io/public/rss/RSSWorldNews",
+      "https://www.investing.com/rss/news.rss",
+      "https://www.coindesk.com/arc/outboundfeeds/rss/"
+    ],
+    "WORLD NEWS": [
+      "https://www.aljazeera.com/xml/rss/all.xml",
+      "https://rss.nytimes.com/services/xml/rss/nyt/World.xml",
+      "https://www.theguardian.com/world/rss",
+      "https://feeds.washingtonpost.com/rss/world",
+      "https://www3.nhk.or.jp/nhkworld/en/news/feeds/",
+      "https://www.france24.com/en/rss"
+    ],
     "GERMANY & EUROPE": [
       "https://www.tagesschau.de/xml/rss2",
       "https://www.spiegel.de/schlagzeilen/tops/index.rss",
-      "https://www.handelsblatt.com/contentexport/feed/top-themen"
+      "https://www.handelsblatt.com/contentexport/feed/top-themen",
+      "https://www.dw.com/en/top-stories/rss-4088",
+      "https://www.thelocal.de/feed/",
+      "https://www.faz.net/rss/aktuell/",
+      "https://www.sueddeutsche.de/rss/"
+    ],
+    "EUROPEAN UNION": [
+      "https://www.euractiv.com/feed/",
+      "https://www.politico.eu/feed/",
+      "https://euobserver.com/rss",
+      "https://www.france24.com/en/europe/rss",
+      "https://www.dw.com/en/european-union/rss-4088"
     ],
     "BRAZIL & LATAM": [
-      "https://g1.globo.com/rss/g1/"
+      "https://g1.globo.com/rss/g1/",
+      "https://agenciabrasil.ebc.com.br/rss/ultimasnoticias/feed.xml",
+      "https://brazilian.report/feed/",
+      "https://mercopress.com/rss",
+      "https://www.americasquarterly.org/feed/",
+      "https://labsnews.com/en/feed/"
     ],
-    "GLOBAL & ECON": [
-      "https://www.aljazeera.com/xml/rss/all.xml",
-      "https://www.scmp.com/rss/2/feed"
+    "KNOWLEDGE BASES": [
+      "https://en.wikipedia.org/w/api.php?action=featuredfeed&feed=featured&feedformat=atom",
+      "https://www.snopes.com/feed/",
+      "https://www.politifact.com/rss/all/",
+      "https://factcheck.afp.com/rss.xml",
+      "https://www.reuters.com/fact-check/rss",
+      "https://fullfact.org/feed/"
+    ],
+    "TRAVEL & DESTINATIONS": [
+      "https://www.lonelyplanet.com/feed.xml",
+      "https://thepointsguy.com/feed/",
+      "https://www.nomadicmatt.com/feed/",
+      "https://travel.state.gov/content/travel/en/international-travel/International-Travel-Country-Information-Pages.html.rss.xml"
+    ],
+    "SHOPPING": [
+      "https://www.mydealz.de/rss",
+      "https://www.testberichte.de/feed.xml",
+      "https://slickdeals.net/newsearch.php?mode=frontpage&searcharea=deals&searchtemps=1&rss=1",
+      "https://www.retaildive.com/feeds/news/"
+    ],
+    "AEC INDUSTRY": [
+      "https://www.constructiondive.com/feeds/news/",
+      "https://aec-business.com/feed",
+      "https://www.theconstructionindex.co.uk/news/rss",
+      "https://www.constructionenquirer.com/feed",
+      "https://www.equipmentworld.com/feed",
+      "https://www.baunetz.de/rss/news.xml",
+      "https://construction.autodesk.com/blog/feed/"
+    ],
+    "MEDICAL": [
+      "https://www.statnews.com/category/pharma/feed/",
+      "https://www.healthcaredive.com/feeds/news/",
+      "https://medicalxpress.com/rss-feed/",
+      "https://www.who.int/rss-feeds/news-english.xml",
+      "https://www.thelancet.com/rssfeed/lancet_current.xml",
+      "https://www.bmj.com/rss/recent.xml",
+      "https://www.beckershospitalreview.com/rss/"
+    ],
+    "AEROSPACE": [
+      "https://spacenews.com/feed/",
+      "https://theaviationist.com/feed/",
+      "https://www.flightglobal.com/rss",
+      "https://simpleflying.com/feed/",
+      "https://www.nasa.gov/rss/dyn/breaking_news.rss",
+      "https://www.esa.int/rssfeed/Our_Activities/Space_News"
+    ],
+    "AUTOMOBILE": [
+      "https://electrek.co/feed/",
+      "https://www.motor1.com/rss/news/",
+      "https://insideevs.com/rss/news/",
+      "https://www.greencarreports.com/rss",
+      "https://automotive.einnews.com/rss",
+      "https://www.automobilwoche.de/rss/",
+      "https://www.auto-motor-und-sport.de/rss/"
+    ],
+    "MARKETING & SOCIAL": [
+      "https://www.marketingdive.com/feeds/news/",
+      "https://www.socialmediatoday.com/feeds/news",
+      "https://searchengineland.com/feed",
+      "https://www.searchenginejournal.com/feed/",
+      "https://www.adweek.com/feed/",
+      "https://www.thedrum.com/rss"
+    ],
+    "HR & SKILLS": [
+      "https://www.hrdive.com/feeds/news/",
+      "https://www.hrexecutive.com/feed/",
+      "https://www.unleash.ai/feed/",
+      "https://www.aihr.com/feed/",
+      "https://joshbersin.com/feed/",
+      "https://www.personneltoday.com/feed/"
+    ],
+    "STARTUPS GLOBAL": [
+      "https://techcrunch.com/category/startups/feed/",
+      "https://techcrunch.com/category/venture/feed/",
+      "https://news.crunchbase.com/feed/",
+      "https://venturebeat.com/feed/",
+      "https://a16z.com/feed/",
+      "https://www.cbinsights.com/research/feed/"
+    ],
+    "STARTUPS DE & EU": [
+      "https://sifted.eu/feed/",
+      "https://www.eu-startups.com/feed/",
+      "https://www.deutsche-startups.de/feed/",
+      "https://t3n.de/rss.xml",
+      "https://www.htgf.de/en/feed/",
+      "https://tech.eu/feed/",
+      "https://siliconcanals.com/feed/"
+    ],
+    "STARTUPS LATAM & PT": [
+      "https://contxto.com/en/feed/",
+      "https://latamlist.com/feed/",
+      "https://labsnews.com/en/feed/",
+      "https://www.startse.com/feed/",
+      "https://lavca.org/feed/",
+      "https://techcrunch.com/region/latin-america/feed/",
+      "https://observador.pt/seccao/tecnologia/feed/"
     ]
   },
   "important_keywords": [
     "breaking", "exclusive", "urgent", "crisis",
     "war", "attack", "election", "vote", "parliament", "eu", "european",
     "trump", "biden", "china", "russia", "ukraine", "nato", "climate",
-    "economy", "recession", "inflation", "market", "stock",
-    "ai", "artificial intelligence", "gpt", "claude", "gemini",
-    "openai", "anthropic", "deepseek", "llm", "reasoning", "multimodal",
+    "economy", "recession", "inflation", "market", "stock", "tariff", "sanctions",
+    "ai", "artificial intelligence", "gpt", "claude", "gemini", "deepseek",
+    "openai", "anthropic", "llm", "reasoning", "multimodal",
     "launch", "release", "announce", "benchmark", "api",
-    "google", "microsoft", "meta", "xai"
+    "google", "microsoft", "meta", "xai", "nvidia", "tsmc", "baidu", "alibaba",
+    "brazil", "lula", "bolsonaro", "latam", "mercosur",
+    "germany", "bundestag", "scholz", "merz", "ecb", "bundesbank",
+    "startup", "funding", "unicorn", "series a", "ipo", "acquisition",
+    "ev", "electric vehicle", "autonomous", "tesla", "byd",
+    "construction", "bim", "infrastructure",
+    "fda", "who", "pandemic", "vaccine",
+    "space", "nasa", "spacex", "satellite",
+    "shopping", "deal", "prime day", "black friday"
   ],
   "settings": {
     "max_entries_per_feed": 5,
     "importance_threshold_for_detail": 3,
-    "max_concurrent_fetchers": 10,
+    "max_concurrent_fetchers": 15,
     "article_max_chars": 2000,
     "request_timeout_seconds": 15
   }

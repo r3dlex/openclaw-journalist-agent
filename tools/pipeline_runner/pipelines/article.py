@@ -11,6 +11,7 @@ from pipeline_runner.runner import Pipeline
 from pipeline_runner.steps.extract import ExtractContentStep
 from pipeline_runner.steps.fetch import FetchUrlStep
 from pipeline_runner.steps.handoff import LibrarianHandoffStep
+from pipeline_runner.steps.iamq import IAMQAnnounceStep
 from pipeline_runner.steps.notify import TelegramNotifyStep
 
 
@@ -27,6 +28,7 @@ def build_article_pipeline(
         2. extract_content — Parse HTML into clean text
         3. librarian_handoff — (optional) Write to log and notify Librarian
         4. telegram_notify — Send extracted content to Telegram
+        5. iamq_announce — Announce completion to IAMQ
     """
     pipeline = Pipeline("article_extraction")
     pipeline.add_step(FetchUrlStep())
@@ -34,6 +36,7 @@ def build_article_pipeline(
     if handoff:
         pipeline.add_step(LibrarianHandoffStep())
     pipeline.add_step(TelegramNotifyStep())
+    pipeline.add_step(IAMQAnnounceStep())
     return pipeline
 
 

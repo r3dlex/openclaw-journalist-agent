@@ -42,7 +42,7 @@ hands off results to the **Librarian** agent for archival.
 │   │   ├── runner.py    # Core pipeline engine
 │   │   ├── scheduler.py # Long-running scheduler service (ARCH-006)
 │   │   ├── pipelines/   # Pre-built pipeline definitions
-│   │   └── steps/       # Composable pipeline steps (fetch, score, format, handoff, notify)
+│   │   └── steps/       # Composable pipeline steps (fetch, score, format, handoff, notify, iamq)
 │   └── tests/           # Test suite (pytest)
 ├── engine/              # Elixir headless browser engine (Tier 2, future)
 │   └── README.md        # Engine architecture notes
@@ -88,6 +88,7 @@ Key variables:
 - `WEATHER_LOCATION`, `WEATHER_COUNTRY` - Weather config
 - `NEWS_API_KEY` - Optional API key
 - `TELEGRAM_BOT_TOKEN`, `TELEGRAM_CHAT_ID` - Telegram notification delivery
+- `IAMQ_HTTP_URL` - Inter-Agent Message Queue service URL (default `http://127.0.0.1:18790`)
 
 ## Scripts & Skills
 

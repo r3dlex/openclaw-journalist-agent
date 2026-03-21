@@ -33,6 +33,7 @@ import schedule
 from pipeline_runner.config import PipelineSettings
 from pipeline_runner.pipelines.news import run_news_pipeline
 from pipeline_runner.pipelines.weather import run_weather_pipeline
+from pipeline_runner.steps.iamq import iamq_heartbeat, iamq_register
 
 logger = logging.getLogger(__name__)
 
@@ -187,6 +188,10 @@ def register_schedule(settings: PipelineSettings) -> list[ScheduledTask]:
     )
     tasks.append(ScheduledTask("Weekly weather", "sunday 21:00", "weather sunday_9pm"))
 
+    # IAMQ heartbeat — every 2 minutes (TTL is 5 min on the MQ side)
+    schedule.every(2).minutes.do(iamq_heartbeat, settings)
+    tasks.append(ScheduledTask("IAMQ heartbeat", "every 2 min", "iamq_heartbeat"))
+
     return tasks
 
 
@@ -202,6 +207,9 @@ def run_scheduler(settings: PipelineSettings | None = None) -> None:
     # Load persisted state so we know which tasks already ran today
     _run_state = _load_state()
     logger.info("Loaded scheduler state: %d tasks previously ran", len(_run_state))
+
+    # Register with IAMQ on startup
+    iamq_register(settings)
 
     tasks = register_schedule(settings)
 

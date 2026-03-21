@@ -22,10 +22,17 @@ def tmp_data_dir(tmp_path: Path) -> Path:
 
 @pytest.fixture
 def feeds_json(tmp_path: Path) -> Path:
-    """Create a minimal feeds.json for testing."""
+    """Create a minimal feeds.json for testing (with domains)."""
     import json
 
     config = {
+        "domains": {
+            "CORE": {
+                "label": "Core Intelligence",
+                "priority": 10,
+                "categories": ["TEST"],
+            },
+        },
         "categories": {
             "TEST": ["https://example.com/feed.xml"],
         },
