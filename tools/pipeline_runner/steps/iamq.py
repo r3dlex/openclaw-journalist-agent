@@ -109,10 +109,8 @@ def iamq_register(settings: PipelineSettings) -> bool:
     try:
         url = f"{settings.iamq_http_url}/register"
         payload = {**AGENT_METADATA}
-        # Include workspace path so other agents can locate our files
-        workspace = str(settings.workspace_dir.resolve())
-        if workspace and workspace != ".":
-            payload["workspace"] = workspace
+        # Always include workspace path so other agents can discover our files
+        payload["workspace"] = str(settings.workspace_dir.resolve())
         resp = requests.post(url, json=payload, timeout=5)
         resp.raise_for_status()
         logger.info("IAMQ: registered as '%s' with metadata", AGENT_ID)
