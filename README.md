@@ -63,8 +63,7 @@ All configuration is via environment variables in `.env`. See `.env.example` for
 | `WEATHER_LOCATION` | City for weather forecasts | `Stuttgart` |
 | `NEWS_API_KEY` | Optional NewsAPI key | - |
 | `FEEDS_FILE` | Path to RSS feed config | `config/feeds.json` |
-| `TELEGRAM_BOT_TOKEN` | Telegram bot token (from @BotFather) | - |
-| `TELEGRAM_CHAT_ID` | Telegram chat ID for delivery | - |
+| *(Telegram)* | Managed by OpenClaw gateway (`~/.openclaw/openclaw.json`) | - |
 | `AGENT_MODEL` | Claude model for the agent | `claude-sonnet-4-20250514` |
 
 ## Skills
