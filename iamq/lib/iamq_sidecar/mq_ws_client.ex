@@ -7,13 +7,13 @@ defmodule IamqSidecar.MqWsClient do
   Auto-reconnects on disconnect.
 
   Env vars:
-    IAMQ_WS_URL   (default ws://127.0.0.1:18791/ws)
+    IAMQ_WS_URL   (default ws://127.0.0.1:18793/ws)
     IAMQ_AGENT_ID  (required)
   """
   use WebSockex
   require Logger
 
-  @default_ws_url "ws://127.0.0.1:18791/ws"
+  @default_ws_url "ws://127.0.0.1:18793/ws"
   @heartbeat_interval 30_000
   @reconnect_interval 15_000
 
