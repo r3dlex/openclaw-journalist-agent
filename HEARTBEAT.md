@@ -47,6 +47,15 @@ Protocol: see `openclaw-inter-agent-message-queue/spec/PROTOCOL.md`.
 - [x] **Check for high-priority RSS stories** — if between scheduled runs
   and something urgent may have dropped, consider an ad-hoc news fetch
 
+## Report to User
+
+After completing all checks above, **send a summary to the user via your messaging channel** (Telegram through OpenClaw gateway). The user cannot see IAMQ messages.
+
+- If you processed MQ requests, ran pipelines, or found notable stories: summarize what happened.
+  Example: "Heartbeat: processed 2 MQ requests, checked RSS (no urgent stories). All quiet."
+- If nothing happened: "All quiet — no new stories, no pending tasks."
+- Errors and warnings: report IMMEDIATELY, don't wait for the heartbeat summary.
+
 ## Rules
 
 - MQ replies go through `POST /send` with `replyTo` — never only Telegram
