@@ -87,7 +87,7 @@ Key variables:
 - `USER_DISPLAY_NAME`, `USER_LOCATION`, etc. - User PII kept out of git
 - `WEATHER_LOCATION`, `WEATHER_COUNTRY` - Weather config
 - `NEWS_API_KEY` - Optional API key
-- `TELEGRAM_BOT_TOKEN`, `TELEGRAM_CHAT_ID` - Telegram notification delivery
+- Telegram credentials are resolved from `~/.openclaw/openclaw.json` (bindings + accounts)
 - `IAMQ_HTTP_URL` - Inter-Agent Message Queue service URL (default `http://127.0.0.1:18790`)
 
 ## Scripts & Skills

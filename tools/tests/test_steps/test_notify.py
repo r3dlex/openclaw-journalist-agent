@@ -7,21 +7,20 @@ from unittest.mock import MagicMock, patch
 from pipeline_runner.config import PipelineSettings
 from pipeline_runner.steps.notify import TelegramNotifyStep
 
+# Patch _resolve_telegram so tests don't depend on ~/.openclaw/openclaw.json
+_PATCH_RESOLVE = "pipeline_runner.config._resolve_telegram"
+
 
 class TestTelegramNotifyStep:
     def _settings_with_telegram(self) -> PipelineSettings:
-        return PipelineSettings(
-            TELEGRAM_BOT_TOKEN="test-token",  # type: ignore[call-arg]
-            TELEGRAM_CHAT_ID="12345",  # type: ignore[call-arg]
-        )
+        """Return settings whose Telegram properties resolve to test values."""
+        with patch(_PATCH_RESOLVE, return_value=("test-token", "12345")):
+            return PipelineSettings()
 
-    def test_should_not_run_without_config(self) -> None:
+    @patch(_PATCH_RESOLVE, return_value=("", ""))
+    def test_should_not_run_without_config(self, _mock: MagicMock) -> None:
         step = TelegramNotifyStep()
-        # Explicitly set empty tokens (PipelineSettings may load .env in CI)
-        settings = PipelineSettings(
-            TELEGRAM_BOT_TOKEN="",  # type: ignore[call-arg]
-            TELEGRAM_CHAT_ID="",  # type: ignore[call-arg]
-        )
+        settings = PipelineSettings()
         ctx: dict[str, object] = {"briefing": "hello", "settings": settings}
         assert step.should_run(ctx) is False
 
@@ -31,7 +30,8 @@ class TestTelegramNotifyStep:
             "briefing": "hello",
             "settings": self._settings_with_telegram(),
         }
-        assert step.should_run(ctx) is True
+        with patch(_PATCH_RESOLVE, return_value=("test-token", "12345")):
+            assert step.should_run(ctx) is True
 
     def test_should_run_with_weather_briefing(self) -> None:
         step = TelegramNotifyStep()
@@ -39,7 +39,8 @@ class TestTelegramNotifyStep:
             "weather_briefing": "sunny",
             "settings": self._settings_with_telegram(),
         }
-        assert step.should_run(ctx) is True
+        with patch(_PATCH_RESOLVE, return_value=("test-token", "12345")):
+            assert step.should_run(ctx) is True
 
     def test_should_run_with_content(self) -> None:
         step = TelegramNotifyStep()
@@ -47,12 +48,14 @@ class TestTelegramNotifyStep:
             "content": "article text",
             "settings": self._settings_with_telegram(),
         }
-        assert step.should_run(ctx) is True
+        with patch(_PATCH_RESOLVE, return_value=("test-token", "12345")):
+            assert step.should_run(ctx) is True
 
     def test_should_not_run_without_content(self) -> None:
         step = TelegramNotifyStep()
         ctx: dict[str, object] = {"settings": self._settings_with_telegram()}
-        assert step.should_run(ctx) is False
+        with patch(_PATCH_RESOLVE, return_value=("test-token", "12345")):
+            assert step.should_run(ctx) is False
 
     @patch("pipeline_runner.steps.notify.requests.post")
     def test_sends_briefing(self, mock_post: MagicMock) -> None:
@@ -66,7 +69,8 @@ class TestTelegramNotifyStep:
             "settings": self._settings_with_telegram(),
             "pipeline_name": "news_briefing",
         }
-        result = step.execute(ctx)
+        with patch(_PATCH_RESOLVE, return_value=("test-token", "12345")):
+            result = step.execute(ctx)
 
         assert result["telegram_sent"] is True
         assert result["telegram_message_id"] == 42
@@ -87,7 +91,8 @@ class TestTelegramNotifyStep:
             "briefing": "Test",
             "settings": self._settings_with_telegram(),
         }
-        result = step.execute(ctx)
+        with patch(_PATCH_RESOLVE, return_value=("test-token", "12345")):
+            result = step.execute(ctx)
 
         assert result["telegram_sent"] is False
         assert result["telegram_message_id"] is None
@@ -101,7 +106,8 @@ class TestTelegramNotifyStep:
             "briefing": "Test",
             "settings": self._settings_with_telegram(),
         }
-        result = step.execute(ctx)
+        with patch(_PATCH_RESOLVE, return_value=("test-token", "12345")):
+            result = step.execute(ctx)
 
         assert result["telegram_sent"] is False
 
@@ -117,18 +123,20 @@ class TestTelegramNotifyStep:
             "briefing": long_content,
             "settings": self._settings_with_telegram(),
         }
-        step.execute(ctx)
+        with patch(_PATCH_RESOLVE, return_value=("test-token", "12345")):
+            step.execute(ctx)
 
         sent_text = mock_post.call_args.kwargs["json"]["text"]
         assert len(sent_text) <= 4096
 
-    def test_empty_content_sets_sent_false(self) -> None:
+    @patch(_PATCH_RESOLVE, return_value=("test-token", "12345"))
+    def test_empty_content_sets_sent_false(self, _mock: MagicMock) -> None:
         step = TelegramNotifyStep()
         ctx: dict[str, object] = {
             "briefing": "",
             "weather_briefing": "",
             "content": "",
-            "settings": self._settings_with_telegram(),
+            "settings": PipelineSettings(),
         }
         result = step.execute(ctx)
         assert result["telegram_sent"] is False

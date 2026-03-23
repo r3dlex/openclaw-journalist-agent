@@ -1,8 +1,8 @@
 """Telegram notification step — send pipeline output to a Telegram chat.
 
 Sends the generated content (briefing, weather, article) to a configured
-Telegram bot chat. Requires TELEGRAM_BOT_TOKEN and TELEGRAM_CHAT_ID
-environment variables.
+Telegram bot chat. Credentials are resolved from ~/.openclaw/openclaw.json
+via the agent's binding (agentId → accountId → botToken + chatId).
 """
 
 from __future__ import annotations
