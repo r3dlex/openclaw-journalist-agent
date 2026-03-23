@@ -42,19 +42,19 @@ Steps should be **idempotent** where possible.
 ### 1. News Briefing (`news_briefing`)
 
 **Trigger:** Cron schedule (see `spec/CRON.md`) or ad-hoc
-**Steps:** `fetch_feeds` -> `score_importance` -> `format_briefing` -> `librarian_handoff` -> `telegram_notify`
+**Steps:** `fetch_feeds` -> `score_importance` -> `format_briefing` -> `librarian_handoff` -> `iamq_announce`
 
 ```
-[RSS Feeds] -> [Concurrent Fetch] -> [Keyword Scoring] -> [Markdown Briefing] -> [Log + Librarian] -> [Telegram]
+[RSS Feeds] -> [Concurrent Fetch] -> [Keyword Scoring] -> [Markdown Briefing] -> [Log + Librarian] -> [IAMQ]
 ```
 
 ### 2. Article Extraction (`article_extraction`)
 
 **Trigger:** Ad-hoc (user request or high-importance story)
-**Steps:** `fetch_url` -> `extract_content` -> `librarian_handoff` (optional) -> `telegram_notify`
+**Steps:** `fetch_url` -> `extract_content` -> `librarian_handoff` (optional) -> `iamq_announce`
 
 ```
-[URL] -> [HTTP GET (Tier 1)] -> [HTML Parse] -> [Clean Text] -> [Log] -> [Telegram]
+[URL] -> [HTTP GET (Tier 1)] -> [HTML Parse] -> [Clean Text] -> [Log] -> [IAMQ]
 ```
 
 If Tier 1 fails, the agent should escalate to Tier 2/3 using `read_article` or `browse_url` skills.
@@ -62,10 +62,10 @@ If Tier 1 fails, the agent should escalate to Tier 2/3 using `read_article` or `
 ### 3. Weather Briefing (`weather_briefing`)
 
 **Trigger:** Cron schedule (see `spec/CRON.md`)
-**Steps:** `fetch_weather` -> `format_weather` -> `librarian_handoff` -> `telegram_notify`
+**Steps:** `fetch_weather` -> `format_weather` -> `librarian_handoff` -> `iamq_announce`
 
 ```
-[wttr.in API] -> [JSON Parse] -> [Markdown Table] -> [Log + Librarian] -> [Telegram]
+[wttr.in API] -> [JSON Parse] -> [Markdown Table] -> [Log + Librarian] -> [IAMQ]
 ```
 
 ## Step Reference
@@ -79,7 +79,7 @@ If Tier 1 fails, the agent should escalate to Tier 2/3 using `read_article` or `
 | `format_briefing` | `steps/format.py` | `scored_entries` | `briefing` |
 | `format_weather` | `steps/format.py` | `weather_data` | `weather_briefing` |
 | `librarian_handoff` | `steps/handoff.py` | `briefing` or `weather_briefing` | `handoff_path` |
-| `telegram_notify` | `steps/notify.py` | `briefing`, `weather_briefing`, or `content` | `telegram_sent`, `telegram_message_id` |
+| `iamq_announce` | `steps/iamq.py` | `briefing`, `weather_briefing`, or `content` | `iamq_announced` |
 
 ## Running Pipelines
 

@@ -19,7 +19,6 @@ docker compose run --rm --profile test pipeline-test
 | `tests/test_steps/test_score.py` | Importance scoring (keywords, boosts, caps) |
 | `tests/test_steps/test_extract.py` | HTML content extraction (tags, truncation) |
 | `tests/test_steps/test_fetch.py` | URL fetching (mock HTTP, error handling) |
-| `tests/test_steps/test_notify.py` | Telegram notifications (10 tests: send, error handling, truncation) |
 | `tests/test_pipelines/test_news.py` | End-to-end news pipeline (mock feeds) |
 | `tests/test_pipelines/test_article.py` | End-to-end article extraction (mock HTTP) |
 | `tests/test_pipelines/test_weather.py` | End-to-end weather pipeline (mock API) |

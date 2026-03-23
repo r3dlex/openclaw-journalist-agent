@@ -52,7 +52,7 @@ pipeline_runner/
     ├── score.py          # Importance scoring
     ├── format.py         # Output formatting
     ├── handoff.py        # Librarian handoff
-    └── notify.py         # Telegram notifications
+    └── iamq.py           # IAMQ inter-agent announcements
 ```
 
 ## Testing
@@ -85,9 +85,7 @@ Dev dependencies: `pytest`, `ruff`, `mypy`
 All pipeline output is logged to `log/pipeline.log` with rotation (5MB, 5 backups).
 The `log/` folder is tracked in git via `.gitkeep` but file contents are gitignored.
 
-## Telegram Notifications
+## Inter-Agent Communication
 
-When `TELEGRAM_BOT_TOKEN` and `TELEGRAM_CHAT_ID` are set in `.env`, every pipeline
-automatically sends its generated content to the configured Telegram chat.
-The `telegram_notify` step is the last step in each pipeline and is silently
-skipped when Telegram is not configured.
+Pipelines announce completion via IAMQ (Inter-Agent Message Queue). User-facing
+delivery (e.g. Telegram) is handled by the OpenClaw gateway, not by this agent.

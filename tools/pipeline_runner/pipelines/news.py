@@ -12,7 +12,6 @@ from pipeline_runner.steps.fetch import FetchFeedsStep
 from pipeline_runner.steps.format import FormatBriefingStep
 from pipeline_runner.steps.handoff import LibrarianHandoffStep
 from pipeline_runner.steps.iamq import IAMQAnnounceStep
-from pipeline_runner.steps.notify import TelegramNotifyStep
 from pipeline_runner.steps.score import ScoreImportanceStep
 
 
@@ -24,15 +23,13 @@ def build_news_pipeline(settings: PipelineSettings | None = None) -> Pipeline:
         2. score_importance — Rank by keyword matching
         3. format_briefing — Produce structured Markdown
         4. librarian_handoff — Write to log and notify Librarian
-        5. telegram_notify — Send briefing to Telegram
-        6. iamq_announce — Announce completion to IAMQ
+        5. iamq_announce — Announce completion to IAMQ
     """
     pipeline = Pipeline("news_briefing")
     pipeline.add_step(FetchFeedsStep())
     pipeline.add_step(ScoreImportanceStep())
     pipeline.add_step(FormatBriefingStep())
     pipeline.add_step(LibrarianHandoffStep())
-    pipeline.add_step(TelegramNotifyStep())
     pipeline.add_step(IAMQAnnounceStep())
     return pipeline
 

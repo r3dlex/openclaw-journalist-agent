@@ -9,9 +9,9 @@ from pipeline_runner.pipelines.weather import build_weather_pipeline
 
 
 class TestWeatherPipeline:
-    def test_pipeline_has_five_steps(self) -> None:
+    def test_pipeline_has_four_steps(self) -> None:
         pipeline = build_weather_pipeline()
-        assert len(pipeline._steps) == 5
+        assert len(pipeline._steps) == 4
 
     def test_pipeline_step_names(self) -> None:
         pipeline = build_weather_pipeline()
@@ -20,7 +20,6 @@ class TestWeatherPipeline:
             "fetch_weather",
             "format_weather",
             "librarian_handoff",
-            "telegram_notify",
             "iamq_announce",
         ]
 

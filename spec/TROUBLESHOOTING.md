@@ -67,23 +67,6 @@
 - The scheduler has error isolation per task — one failing pipeline should not crash the service
 - If persistent crashes, check `tools/pipeline_runner/scheduler.py` for the error handler
 
-## Telegram Notifications
-
-### Notifications not sending
-- Verify `TELEGRAM_BOT_TOKEN` and `TELEGRAM_CHAT_ID` are set in `.env`
-- Get your chat ID from `@userinfobot` on Telegram
-- Test the bot token: `curl https://api.telegram.org/bot<token>/getMe`
-- The `telegram_notify` step is skipped silently if not configured (no error)
-
-### Messages truncated
-- Telegram has a 4096-character limit per message
-- Long briefings are automatically truncated with a note pointing to the log file
-
-### Bot can't send to chat
-- Ensure you've started a conversation with the bot first (`/start`)
-- For group chats, the bot must be a member of the group
-- Check the bot has permission to send messages
-
 ## Logging
 
 ### No log files in `log/`

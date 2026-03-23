@@ -9,9 +9,9 @@ from pipeline_runner.pipelines.news import build_news_pipeline
 
 
 class TestNewsPipeline:
-    def test_pipeline_has_six_steps(self) -> None:
+    def test_pipeline_has_five_steps(self) -> None:
         pipeline = build_news_pipeline()
-        assert len(pipeline._steps) == 6
+        assert len(pipeline._steps) == 5
 
     def test_pipeline_step_names(self) -> None:
         pipeline = build_news_pipeline()
@@ -21,7 +21,6 @@ class TestNewsPipeline:
             "score_importance",
             "format_briefing",
             "librarian_handoff",
-            "telegram_notify",
             "iamq_announce",
         ]
 
