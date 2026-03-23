@@ -22,9 +22,8 @@ services:
       - LIBRARIAN_WORKSPACE_MOUNT=/app/librarian_workspace
     volumes:
       - ./config:/app/config:ro
-      # Bind mounts from Cowboy_One host path to container /app paths
-      - /Volumes/Cowboy_One/agent/openclaw-journalist-agent/log:/app/log:rw
-      - /Volumes/Cowboy_One/agent/openclaw-journalist-agent/reports:/app/reports:rw
+      - ${JOURNALIST_LOG_DIR:-./log}:/app/log:rw
+      - ${JOURNALIST_REPORTS_DIR:-./reports}:/app/reports:rw
       # Mount librarian workspace so handoff step can write signals
       - ${LIBRARIAN_AGENT_WORKSPACE:-.}:/app/librarian_workspace:rw
     working_dir: /app
@@ -81,7 +80,7 @@ services:
 
   # ── IAMQ sidecar — inter-agent messaging (Elixir/OTP, zero-install) ──
   iamq:
-    build: ./iamq
+    image: openclaw-iamq-sidecar:latest
     restart: unless-stopped
     environment:
       IAMQ_HTTP_URL: http://host.docker.internal:18790
