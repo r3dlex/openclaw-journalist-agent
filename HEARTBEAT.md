@@ -49,12 +49,11 @@ Protocol: see `openclaw-inter-agent-message-queue/spec/PROTOCOL.md`.
 
 ## Report to User
 
-After completing all checks above, **send a summary to the user via your messaging channel** (Telegram through OpenClaw gateway). The user cannot see IAMQ messages.
-
-- If you processed MQ requests, ran pipelines, or found notable stories: summarize what happened.
-  Example: "Heartbeat: processed 2 MQ requests, checked RSS (no urgent stories). All quiet."
-- If nothing happened: "All quiet — no new stories, no pending tasks."
-- Errors and warnings: report IMMEDIATELY, don't wait for the heartbeat summary.
+Send a Telegram summary ONLY when there's something worth reporting:
+- Pipelines completed, MQ requests processed, notable stories found.
+  Example: "Published news briefing (12 articles). Archived to Librarian."
+- Errors, pipeline failures: report IMMEDIATELY.
+- Do NOT send a message if nothing happened. Silent heartbeats are fine.
 
 ## Rules
 
