@@ -16,6 +16,7 @@ from pipeline_runner.runner import Pipeline
 from pipeline_runner.steps.format import FormatWeatherStep
 from pipeline_runner.steps.handoff import LibrarianHandoffStep
 from pipeline_runner.steps.iamq import IAMQAnnounceStep
+from pipeline_runner.steps.notify import TelegramNotifyStep
 
 logger = logging.getLogger(__name__)
 
@@ -54,12 +55,14 @@ def build_weather_pipeline(settings: PipelineSettings | None = None) -> Pipeline
         2. format_weather — Produce readable Markdown
         3. librarian_handoff — Write to log and notify Librarian
         4. iamq_announce — Announce completion to IAMQ
+        5. telegram_notify — Send weather to user via Telegram
     """
     pipeline = Pipeline("weather_briefing")
     pipeline.add_step(FetchWeatherStep())
     pipeline.add_step(FormatWeatherStep())
     pipeline.add_step(LibrarianHandoffStep())
     pipeline.add_step(IAMQAnnounceStep())
+    pipeline.add_step(TelegramNotifyStep())
     return pipeline
 
 

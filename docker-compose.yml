@@ -21,9 +21,9 @@ services:
       # Mounted path for librarian workspace (container-internal path)
       - LIBRARIAN_WORKSPACE_MOUNT=/app/librarian_workspace
     volumes:
-      - ./config:/app/config:ro
-      - ${JOURNALIST_LOG_DIR:-./log}:/app/log:rw
-      - ${JOURNALIST_REPORTS_DIR:-./reports}:/app/reports:rw
+      - journalist_config:/app/config:ro
+      - journalist_logs:/app/log:rw
+      - journalist_reports:/app/reports:rw
       # Mount librarian workspace so handoff step can write signals
       - ${LIBRARIAN_AGENT_WORKSPACE:-.}:/app/librarian_workspace:rw
     working_dir: /app
@@ -47,9 +47,9 @@ services:
       - PYTHONUNBUFFERED=1
       - JOURNALIST_DATA_DIR=/app
     volumes:
-      - ./config:/app/config:ro
-      - ${JOURNALIST_DATA_DIR:-.}/log:/app/log
-      - ${JOURNALIST_DATA_DIR:-.}/reports:/app/reports
+      - journalist_config:/app/config:ro
+      - journalist_logs:/app/log:rw
+      - journalist_reports:/app/reports:rw
     working_dir: /app
     profiles: ["cli"]
 
@@ -61,7 +61,7 @@ services:
       target: test
     env_file: .env
     volumes:
-      - ./config:/app/config:ro
+      - journalist_config:/app/config:ro
     working_dir: /app
     profiles: ["test"]
 
@@ -72,9 +72,9 @@ services:
     env_file: .env
     volumes:
       - ./scripts:/app/scripts:ro
-      - ./config:/app/config:ro
-      - ${JOURNALIST_DATA_DIR:-.}/log:/app/log
-      - ${JOURNALIST_DATA_DIR:-.}/reports:/app/reports
+      - journalist_config:/app/config:ro
+      - journalist_logs:/app/log:rw
+      - journalist_reports:/app/reports:rw
     working_dir: /app
     profiles: ["legacy"]
 
@@ -94,3 +94,8 @@ services:
       IAMQ_POLL_MS: "60000"
     extra_hosts:
       - "host.docker.internal:host-gateway"
+
+volumes:
+  journalist_config:
+  journalist_logs:
+  journalist_reports:

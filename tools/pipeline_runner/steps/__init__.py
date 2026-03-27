@@ -5,6 +5,7 @@ from pipeline_runner.steps.fetch import FetchFeedsStep, FetchUrlStep
 from pipeline_runner.steps.format import FormatBriefingStep, FormatWeatherStep
 from pipeline_runner.steps.handoff import LibrarianHandoffStep
 from pipeline_runner.steps.iamq import IAMQAnnounceStep
+from pipeline_runner.steps.notify import TelegramNotifyStep
 from pipeline_runner.steps.score import ScoreImportanceStep
 
 __all__ = [
@@ -16,4 +17,5 @@ __all__ = [
     "IAMQAnnounceStep",
     "LibrarianHandoffStep",
     "ScoreImportanceStep",
+    "TelegramNotifyStep",
 ]

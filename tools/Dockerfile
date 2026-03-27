@@ -14,6 +14,7 @@ RUN poetry install --only main --no-root --no-interaction
 
 # Copy source
 COPY pipeline_runner/ pipeline_runner/
+COPY config/ config/
 
 # Install the package itself
 RUN poetry install --only main --no-interaction

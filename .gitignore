@@ -78,6 +78,9 @@ docker-compose.override.yml
 # --- Poetry (lock file is committed, but not the venv) ---
 tools/.venv/
 
+# --- Sensitive config (domain-specific feeds, accounts) ---
+tools/config/
+
 # --- Misc ---
 *.tmp
 *.bak
