@@ -9,9 +9,9 @@ from pipeline_runner.pipelines.weather import build_weather_pipeline
 
 
 class TestWeatherPipeline:
-    def test_pipeline_has_four_steps(self) -> None:
+    def test_pipeline_has_five_steps(self) -> None:
         pipeline = build_weather_pipeline()
-        assert len(pipeline._steps) == 4
+        assert len(pipeline._steps) == 5
 
     def test_pipeline_step_names(self) -> None:
         pipeline = build_weather_pipeline()
@@ -21,6 +21,7 @@ class TestWeatherPipeline:
             "format_weather",
             "librarian_handoff",
             "iamq_announce",
+            "telegram_notify",
         ]
 
     @patch("pipeline_runner.pipelines.weather.requests.get")
