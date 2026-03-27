@@ -42,7 +42,7 @@ select = ["E", "F", "I", "N", "W", "UP", "B", "SIM", "RUF"]
 
 [tool.pytest.ini_options]
 testpaths = ["tests"]
-addopts = "--strict-markers -v --tb=short --cov=pipeline_runner --cov-report=term-missing --cov-fail-under=60"
+addopts = "--strict-markers -v --tb=short --cov=pipeline_runner --cov-report=term-missing"
 markers = [
     "integration: marks tests as integration tests (deselect with '-m \"not integration\"')",
     "slow: marks tests as slow (deselect with '-m \"not slow\"')",

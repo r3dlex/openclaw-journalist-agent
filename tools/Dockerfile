@@ -14,7 +14,10 @@ RUN poetry install --only main --no-root --no-interaction
 
 # Copy source
 COPY pipeline_runner/ pipeline_runner/
-COPY config/ config/
+
+# Config is mounted at runtime via docker-compose volumes.
+# Create empty dir so the app has a valid path even without mounts.
+RUN mkdir -p config
 
 # Install the package itself
 RUN poetry install --only main --no-interaction

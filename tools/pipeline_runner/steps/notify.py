@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import logging
 import os
+
 import requests
 
 logger = logging.getLogger(__name__)

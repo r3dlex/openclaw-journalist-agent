@@ -75,7 +75,7 @@ jobs:
         run: poetry install
 
       - name: Run unit tests with coverage
-        run: poetry run pytest tests/ -v --tb=short --cov=pipeline_runner --cov-report=xml --cov-report=term-missing
+        run: poetry run pytest tests/ -v --tb=short --cov=pipeline_runner --cov-report=xml --cov-report=term-missing --cov-fail-under=60
 
       - name: Upload coverage artifact
         if: matrix.python-version == '3.12'
@@ -216,15 +216,19 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      - name: Validate feeds.json
+      - name: Validate feeds.json (if present)
         run: |
-          python3 -c "
+          if [ -f config/feeds.json ]; then
+            python3 -c "
           import json
           d = json.load(open('config/feeds.json'))
           feeds = sum(len(v) for v in d['categories'].values())
           cats = len(d['categories'])
           print(f'OK: {feeds} feeds in {cats} categories')
           "
+          else
+            echo "OK: config/feeds.json is gitignored (runtime-only config)"
+          fi
 
       - name: Validate .env.example has all required vars
         run: |
