@@ -85,7 +85,7 @@ class TelegramNotifyStep:
 
         # Truncate if needed (Telegram message limit is ~4096 chars)
         if len(content) > MAX_MESSAGE_LENGTH:
-            content = content[:MAX_MESSAGE_LENGTH - 50] + "\n\n[...] (truncated)"
+            content = content[: MAX_MESSAGE_LENGTH - 50] + "\n\n[...] (truncated)"
 
         url = f"https://api.telegram.org/bot{token}/sendMessage"
         try:
