@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import logging
 import os
+from typing import Any
 
 import requests
 
@@ -35,7 +36,8 @@ def _resolve_token() -> str | None:
                 config = json.load(f)
             channels = config.get("channels", {})
             default_telegram = channels.get("telegram", {}).get("accounts", {}).get("default", {})
-            return default_telegram.get("botToken")
+            bot_token: str | None = default_telegram.get("botToken")
+            return bot_token
         except Exception:
             pass
 
@@ -62,7 +64,7 @@ class TelegramNotifyStep:
 
     name = "telegram_notify"
 
-    def should_run(self, context: dict) -> bool:
+    def should_run(self, context: dict[str, Any]) -> bool:
         """Run if we have both a token and chat ID."""
         token = _resolve_token()
         chat_id = _resolve_chat_id()
@@ -74,7 +76,7 @@ class TelegramNotifyStep:
             return False
         return True
 
-    def execute(self, context: dict) -> dict:
+    def execute(self, context: dict[str, Any]) -> dict[str, Any]:
         """Send the briefing to Telegram. Returns context for pipeline continuity."""
         token = _resolve_token()
         chat_id = _resolve_chat_id()
