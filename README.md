@@ -1,3 +1,7 @@
+<p align="center">
+  <img src="assets/logo.svg" alt="Journalist Agent logo" width="96" height="96">
+</p>
+
 # OpenClaw Journalist Agent
 
 An autonomous research and intelligence briefing agent built on [OpenClaw](https://docs.openclaw.ai/).

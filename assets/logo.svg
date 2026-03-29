@@ -1,0 +1,13 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 128 128" width="128" height="128">
+  <!-- Main newspaper body -->
+  <rect x="16" y="16" width="80" height="96" rx="4" ry="4" fill="none" stroke="#F39C12" stroke-width="7"/>
+  <!-- Folded corner -->
+  <path d="M96 16 L96 44 L112 44 L112 104 C112 107, 109 112, 104 112 L24 112" fill="none" stroke="#F39C12" stroke-width="7" stroke-linejoin="round"/>
+  <line x1="96" y1="16" x2="112" y2="44" stroke="#F39C12" stroke-width="7" stroke-linecap="round"/>
+  <!-- Text lines -->
+  <line x1="32" y1="38" x2="80" y2="38" stroke="#F39C12" stroke-width="5" stroke-linecap="round"/>
+  <line x1="32" y1="54" x2="72" y2="54" stroke="#F39C12" stroke-width="4" stroke-linecap="round"/>
+  <line x1="32" y1="68" x2="76" y2="68" stroke="#F39C12" stroke-width="4" stroke-linecap="round"/>
+  <line x1="32" y1="82" x2="68" y2="82" stroke="#F39C12" stroke-width="4" stroke-linecap="round"/>
+  <line x1="32" y1="96" x2="74" y2="96" stroke="#F39C12" stroke-width="4" stroke-linecap="round"/>
+</svg>
