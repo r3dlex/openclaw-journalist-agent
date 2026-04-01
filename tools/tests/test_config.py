@@ -41,6 +41,7 @@ class TestFeedConfig:
         assert config.max_entries_per_feed == 3
         assert config.importance_threshold == 2
         assert config.max_concurrent_fetchers == 2
+        assert config.article_max_chars == 1000
 
     def test_reload(self, feeds_json: Path) -> None:
         config = FeedConfig(feeds_json)
