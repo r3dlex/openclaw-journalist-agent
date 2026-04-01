@@ -1,5 +1,5 @@
 <p align="center">
-  <img src="assets/logo.svg" alt="Journalist Agent logo" width="96" height="96">
+  <img src="assets/banner.svg" alt="openclaw-journalist-agent" width="600">
 </p>
 
 # OpenClaw Journalist Agent
