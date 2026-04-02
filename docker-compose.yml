@@ -78,20 +78,17 @@ services:
     working_dir: /app
     profiles: ["legacy"]
 
-  # ── IAMQ sidecar — inter-agent messaging (Elixir/OTP, zero-install) ──
   iamq:
-    image: openclaw-iamq-sidecar:latest
+    build: ./iamq
     restart: unless-stopped
     environment:
       IAMQ_HTTP_URL: http://host.docker.internal:18790
       IAMQ_WS_URL: ws://host.docker.internal:18793/ws
       IAMQ_AGENT_ID: journalist_agent
-      IAMQ_AGENT_NAME: Journalist
-      IAMQ_AGENT_EMOJI: "\U0001F4F0"
-      IAMQ_AGENT_DESC: "News gathering, article extraction, weather briefings, and content pipeline"
-      IAMQ_AGENT_CAPABILITIES: article_extraction,news_briefing,weather_briefing,content_pipeline,research,web_crawl,summarize,rss_monitor
-      IAMQ_HEARTBEAT_MS: "300000"
-      IAMQ_POLL_MS: "60000"
+      IAMQ_AGENT_NAME: Journalist Agent
+      IAMQ_AGENT_EMOJI: 📰
+      IAMQ_AGENT_DESC: Researches, writes, and publishes articles and posts
+      IAMQ_AGENT_CAPABILITIES: write_article,publish_post,research_topic,summarize_content
     extra_hosts:
       - "host.docker.internal:host-gateway"
 
