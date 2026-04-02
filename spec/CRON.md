@@ -42,3 +42,10 @@ _(Move tasks here when they're no longer active, with date retired.)_
 
 **Owner:** Journalist agent. Keep this current.
 **Related:** `spec/PIPELINES.md`, `spec/ARCHITECTURE.md`, `ARCH-005` (cost management)
+
+## References
+
+- [IAMQ Cron Subsystem](https://github.com/r3dlex/openclaw-inter-agent-message-queue/blob/main/spec/CRON.md) — how cron schedules are stored and fired
+- [IAMQ API — Cron endpoints](https://github.com/r3dlex/openclaw-inter-agent-message-queue/blob/main/spec/API.md#cron-scheduling)
+- [IamqSidecar.MqClient.register_cron/3](https://github.com/r3dlex/openclaw-inter-agent-message-queue/tree/main/sidecar) — Elixir sidecar helper
+- [openclaw-main-agent](https://github.com/r3dlex/openclaw-main-agent) — orchestrates cron-triggered pipelines
